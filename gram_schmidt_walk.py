@@ -39,7 +39,12 @@ References
 import numpy as np
 
 
-def gram_schmidt_walk(B, z0=None, seed=None):
+def _quantize(x, scale, inv_scale):
+    """Round x to a fixed number of mantissa bits: round(x * 2^b) / 2^b."""
+    return np.round(x * scale) * inv_scale
+
+
+def gram_schmidt_walk(B, z0=None, seed=None, dtype=None, mantissa_bits=None):
     """
     Gram-Schmidt Walk algorithm for vector balancing / discrepancy.
 
@@ -54,6 +59,16 @@ def gram_schmidt_walk(B, z0=None, seed=None):
         end up as +1 or -1).
     seed : int or None, optional
         Random seed for reproducibility.
+    dtype : numpy dtype, optional
+        Floating-point precision to use for all arithmetic
+        (e.g. np.float16, np.float32, np.float64).
+        Default is np.float64.
+    mantissa_bits : int or None, optional
+        If set, emulate a floating-point type with this many mantissa
+        bits via fixed-point quantization (round(x*2^b)/2^b) after
+        every key operation.  Works in float64 internally.
+        Useful values: 10 (float16-like) to 52 (float64 = no-op).
+        Overrides dtype when set.
 
     Returns
     -------
@@ -81,12 +96,28 @@ def gram_schmidt_walk(B, z0=None, seed=None):
         in [-1, 1]^n.
     """
     rng = np.random.default_rng(seed)
-    B = np.asarray(B, dtype=np.float32)
+
+    # --- precision setup ---
+    if mantissa_bits is not None:
+        dtype = np.float64
+        Q_scale = 2.0 ** mantissa_bits
+        Q_inv   = 1.0 / Q_scale
+        Q = lambda x: _quantize(x, Q_scale, Q_inv)
+        eps = Q_inv                        # effective machine epsilon
+    else:
+        if dtype is None:
+            dtype = np.float64
+        dtype = np.dtype(dtype)
+        Q = lambda x: x                   # no-op
+        eps = np.finfo(dtype).eps
+
+    B = Q(np.asarray(B, dtype=np.float64)).astype(dtype)
     m, n = B.shape
 
-    # --- validate norms ---
-    norms = np.linalg.norm(B, axis=0)
-    if np.any(norms > 1.0 + 1e-6):
+    # --- validate norms (always in float64 for safety) ---
+    norms = np.linalg.norm(B.astype(np.float64), axis=0)
+    norm_tol = max(1e-6, 1000 * float(eps))
+    if np.any(norms > 1.0 + norm_tol):
         raise ValueError(
             f"All columns of B must have norm <= 1; "
             f"max norm is {norms.max():.6f}"
@@ -94,16 +125,16 @@ def gram_schmidt_walk(B, z0=None, seed=None):
 
     # --- initial fractional coloring ---
     if z0 is not None:
-        z_t = np.array(z0, dtype=np.float32)
+        z_t = Q(np.array(z0, dtype=np.float64))
         if z_t.shape != (n,):
             raise ValueError(f"z0 shape {z_t.shape} != ({n},)")
         if np.any(np.abs(z_t) > 1.0 + 1e-10):
             raise ValueError("z0 entries must lie in [-1, 1]")
     else:
-        z_t = np.zeros(n, dtype=np.float32)
+        z_t = np.zeros(n, dtype=np.float64)
 
-    tol = 100 * np.finfo(float).eps
-    zero_tol = 10 * np.finfo(float).eps
+    tol = 100 * eps
+    zero_tol = 10 * eps
 
     # --- alive (unfrozen) indicator ---
     alive = np.ones(n, dtype=bool)
@@ -115,7 +146,7 @@ def gram_schmidt_walk(B, z0=None, seed=None):
     # --- maintain G = sum_{i alive} b_i b_i^T  (m x m) ---
     # updated via rank-1 downdates when a coordinate freezes
     alive_idx = np.flatnonzero(alive)
-    G = B[:, alive_idx] @ B[:, alive_idx].T
+    G = Q(B[:, alive_idx] @ B[:, alive_idx].T)
 
     # ------------------------------------------------------------------ #
     #  Main loop — each iteration freezes at least one coordinate
@@ -142,13 +173,18 @@ def gram_schmidt_walk(B, z0=None, seed=None):
         #
         #    Derivation uses the Woodbury identity to move from the k x k
         #    alive-set system to an m x m system.  See Section 3 of [1].
-        C = np.eye(m) + G - np.outer(bp, bp)
+        C = Q(np.eye(m) + G - np.outer(bp, bp))
 
+        # np.linalg.solve requires at least float32; upcast, solve, cast back
+        solve_dtype = np.float32 if dtype == np.float16 else np.float64
+        C_s = C.astype(solve_dtype)
+        bp_s = bp.astype(solve_dtype)
         try:
-            w = np.linalg.solve(C, bp)          # w = C^{-1} b_p
+            w = np.linalg.solve(C_s, bp_s)
         except np.linalg.LinAlgError:
-            C += 1e-10 * np.eye(m)
-            w = np.linalg.solve(C, bp)
+            C_s += np.finfo(solve_dtype).eps * 100 * np.eye(m, dtype=solve_dtype)
+            w = np.linalg.solve(C_s, bp_s)
+        w = Q(w.astype(np.float64))
 
         # build local direction vector (length k, indexed like alive_idx)
         u_alive = np.zeros(k)
@@ -160,7 +196,7 @@ def gram_schmidt_walk(B, z0=None, seed=None):
         np_local = np.where(non_pivot_mask)[0]
 
         if len(np_local) > 0:
-            u_alive[np_local] = -(B[:, alive_idx[np_local]].T @ w)
+            u_alive[np_local] = Q(-(B[:, alive_idx[np_local]].T @ w))
 
         # 3. Compute step sizes
         #
@@ -179,7 +215,7 @@ def gram_schmidt_walk(B, z0=None, seed=None):
             prob_p = (1.0 + z_t[p]) / 2.0
             z_t[p] = 1.0 if rng.random() < prob_p else -1.0
             alive[p] = False
-            G -= np.outer(bp, bp)
+            G = Q(G - np.outer(bp, bp))
             continue
 
         u_nz = u_alive[nz]
@@ -203,14 +239,14 @@ def gram_schmidt_walk(B, z0=None, seed=None):
         prob_forward = delta_minus / (delta_plus + delta_minus)
         step = delta_plus if rng.random() < prob_forward else -delta_minus
 
-        z_t[alive_idx] += step * u_alive
+        z_t[alive_idx] = Q(z_t[alive_idx] + step * u_alive)
 
         # 5. Freeze coordinates that reached +-1
         for i in alive_idx:
             if abs(abs(z_t[i]) - 1.0) < tol:
                 z_t[i] = 1.0 if z_t[i] > 0 else -1.0
                 alive[i] = False
-                G -= np.outer(B[:, i], B[:, i])
+                G = Q(G - np.outer(B[:, i], B[:, i]))
 
     # --- snap any stragglers (numerical edge case) ---
     remaining = np.flatnonzero(alive)

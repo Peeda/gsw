@@ -12,7 +12,6 @@ Equivalently (all with sigma^2 = 1):
 
 import numpy as np
 from gram_schmidt_walk import gram_schmidt_walk
-from joblib import Parallel, delayed
 
 try:
     import matplotlib.pyplot as plt
@@ -27,22 +26,13 @@ except ImportError:
 
 def collect_discrepancies(B, num_samples, seed=42):
     """Run GSW num_samples times, return (num_samples, m) discrepancy array."""
-    #m, n = B.shape
-    #rng = np.random.default_rng(seed)
-    #samples = np.zeros((num_samples, m))
-    #for i in range(num_samples):
-    #    z_t = gram_schmidt_walk(B, seed=rng.integers(2**62))
-    #    samples[i] = B @ z_t
-    #return samples
     m, n = B.shape
     rng = np.random.default_rng(seed)
-    seeds = rng.integers(2**62, size=num_samples)
-
-    results = Parallel(n_jobs=-1)(
-        delayed(lambda s: B @ gram_schmidt_walk(B, seed=s))(s)
-        for s in seeds
-    )
-    return np.array(results)
+    samples = np.zeros((num_samples, m))
+    for i in range(num_samples):
+        z_t = gram_schmidt_walk(B, seed=rng.integers(2**62))
+        samples[i] = B @ z_t
+    return samples
 
 
 def stable_log_mgf(samples, lam):
@@ -304,8 +294,8 @@ def test_1_subgaussian(B, num_samples=10000, seed=42):
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
 
-    n, m = 3000, 8
+    n, m = 300, 8
     B = rng.standard_normal((m, n))
     B /= np.linalg.norm(B, axis=0, keepdims=True)
 
-    test_1_subgaussian(B, num_samples=1000, seed=42)
+    test_1_subgaussian(B, num_samples=10000, seed=42)

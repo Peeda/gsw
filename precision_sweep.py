@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
     m = 16
     #n_values = [20, 50, 100, 500, 1000]
-    n_values = [2000]
+    n_values = [300]
     bits_values = [10, 14, 18, 23, 30, 40, 52]  # 10=~float16, 23=float32, 52=float64
     #bits_values = [10, 18, 30, 52]  # 10=~float16, 23=float32, 52=float64
     num_samples = 1000

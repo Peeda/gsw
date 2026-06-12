@@ -13,12 +13,21 @@ import gsw
 EXP_BITS = 11  # fixed; matches fp64 exponent width
 
 
-def _one_sample(m: int, n: int, sig_bits: int) -> gsw.WalkResult:
-    B = np.random.standard_normal((m, n))
-    B /= np.linalg.norm(B, axis=0, keepdims=True)
+def _one_sample(B: np.ndarray, sig_bits: int) -> gsw.WalkResult:
     chop = None if sig_bits == 52 else Chop(EXP_BITS, sig_bits)
-    noise = lambda size: np.random.normal(0, 0, size)
+    noise = lambda size: np.random.normal(0.0, 2**(-32), size)
     return gsw.gram_schmidt_walk(B, chop=chop, noise=noise)
+
+
+def _test_directions(B: np.ndarray, num_random: int = 20) -> np.ndarray:
+    """Unit test directions in R^m: random + top left singular vectors of B."""
+    m = B.shape[0]
+    random_dirs = np.random.standard_normal((num_random, m))
+    random_dirs /= np.linalg.norm(random_dirs, axis=1, keepdims=True)
+    U, _, _ = np.linalg.svd(B, full_matrices=False)
+    k = min(U.shape[1], 10)
+    svd_dirs = U[:, :k].T  # shape (k, m)
+    return np.vstack([random_dirs, svd_dirs])  # shape (num_random + k, m)
 
 
 def _subgaussian_sigma(vals: np.ndarray) -> tuple[float, float]:
@@ -49,24 +58,44 @@ def _subgaussian_sigma(vals: np.ndarray) -> tuple[float, float]:
 
 
 def precision_sweep(m: int, n: int, num_samples: int = 1000) -> None:
-    """Sweep mantissa bits 2–52 (exp fixed at 11); plot mean discrepancy and subgaussianity."""
-    sig_range = range(2, 53, 5)
+    """Sweep mantissa bits 2–52 (exp fixed at 11); plot mean of Bz (dim 0) and subgaussianity."""
+    u = np.random.randn(m); u /= np.linalg.norm(u)
+    epsilon = 1 / np.sqrt(m)
+    B = u[:, None] + epsilon * np.random.randn(m, n)
+    B /= np.linalg.norm(B, axis=0)
+
+    # B = np.random.standard_normal((m, n))
+    # B[:, 0] *= 10
+    # B /= np.linalg.norm(B, axis=0, keepdims=True)
+
+    # B = np.eye(m)
+
+    sig_range = range(2, 53, 10)
     mean_discrepancies = []
     sigma_moms  = []
     sigma_tails = []
 
-    for sig_bits in tqdm(sig_range, desc="sig_bits"):
-        inf_norms = np.zeros(num_samples)
-        Bz_all = []
-        for i in tqdm(range(num_samples), desc=f"  sig_bits={sig_bits:2d}", leave=False):
-            r = _one_sample(m, n, sig_bits)
-            inf_norms[i] = np.abs(r.Bz).max()
-            Bz_all.append(r.Bz)
+    directions = _test_directions(B)  # (D, m)
 
-        mean_discrepancies.append(inf_norms.mean())
-        sigma_mom, sigma_tail = _subgaussian_sigma(np.concatenate(Bz_all))
-        sigma_moms.append(sigma_mom)
-        sigma_tails.append(sigma_tail)
+    for sig_bits in tqdm(sig_range, desc="sig_bits"):
+        bz_means = np.zeros(num_samples)
+        projections = np.zeros((len(directions), num_samples))  # (D, N)
+
+        for i in tqdm(range(num_samples), desc=f"  sig_bits={sig_bits:2d}", leave=False):
+            r = _one_sample(B, sig_bits)
+            bz_means[i] = r.Bz.mean(axis=0)
+            projections[:, i] = directions @ r.Bz  # project onto each direction
+
+        mean_discrepancies.append(bz_means.mean())
+
+        # Max subgaussian parameter over all test directions
+        sigma_mom_max = sigma_tail_max = 0.0
+        for proj in projections:
+            sm, st = _subgaussian_sigma(proj)
+            sigma_mom_max  = max(sigma_mom_max,  sm)
+            sigma_tail_max = max(sigma_tail_max, st)
+        sigma_moms.append(sigma_mom_max)
+        sigma_tails.append(sigma_tail_max)
 
     sig_list = list(sig_range)
     fig, (ax_disc, ax_sg) = plt.subplots(1, 2, figsize=(10, 4))
@@ -74,7 +103,7 @@ def precision_sweep(m: int, n: int, num_samples: int = 1000) -> None:
 
     ax_disc.plot(sig_list, mean_discrepancies, marker="o", markersize=3)
     ax_disc.set_xlabel("mantissa bits (sig_bits)")
-    ax_disc.set_ylabel("mean ‖Bz‖∞")
+    ax_disc.set_ylabel("mean of Bz (dim 0)")
     ax_disc.axhline(0.0, color="gray", linestyle="--", linewidth=0.8, label="ideal (0)")
     ax_disc.legend()
 
@@ -90,4 +119,4 @@ def precision_sweep(m: int, n: int, num_samples: int = 1000) -> None:
 
 
 if __name__ == "__main__":
-    precision_sweep(m=20, n=25, num_samples=100)
+    precision_sweep(m=500, n=100, num_samples=250)

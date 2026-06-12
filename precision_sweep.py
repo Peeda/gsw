@@ -1,124 +1,93 @@
-"""
-Sweep over n and emulated mantissa-bit precision (10–52 bits)
-to see how the empirical sub-Gaussian parameter sigma^2 of the
-Gram-Schmidt Walk discrepancy varies.
+import os
+os.environ.setdefault("chop_backend", "numpy")
 
-For each (n, bits) pair we:
-  1. Generate a random B (m x n) with unit-norm columns.
-  2. Run GSW many times with mantissa_bits=bits.
-  3. Estimate sigma^2 = sup_lambda  (2/lambda^2) log E[exp(lambda X)]
-     over all coordinates j  (the "MGF sub-Gaussian parameter").
-"""
-
+import matplotlib
+matplotlib.use("TkAgg")
+import matplotlib.pyplot as plt
 import numpy as np
-from multiprocessing import Pool
-from gram_schmidt_walk import gram_schmidt_walk
+from pychop import Chop
+from tqdm import tqdm
+
+import gsw
+
+EXP_BITS = 11  # fixed; matches fp64 exponent width
 
 
-# ------------------------------------------------------------------ #
-#  Helpers
-# ------------------------------------------------------------------ #
-
-def stable_log_mgf(samples, lam):
-    """log E[exp(lambda * X)] with log-sum-exp stability."""
-    lx = lam * samples
-    c = np.max(lx)
-    return c + np.log(np.mean(np.exp(lx - c)))
+def _one_sample(m: int, n: int, sig_bits: int) -> gsw.WalkResult:
+    B = np.random.standard_normal((m, n))
+    B /= np.linalg.norm(B, axis=0, keepdims=True)
+    chop = None if sig_bits == 52 else Chop(EXP_BITS, sig_bits)
+    noise = lambda size: np.random.normal(0, 0, size)
+    return gsw.gram_schmidt_walk(B, chop=chop, noise=noise)
 
 
-def estimate_sigma_sq(disc_samples, lam_grid):
+def _subgaussian_sigma(vals: np.ndarray) -> tuple[float, float]:
     """
-    Estimate the sub-Gaussian parameter sigma^2 from discrepancy
-    samples (num_samples, m).
+    Estimate the subgaussian parameter sigma two ways.
 
-    Returns the worst-case (over coordinates) of
-        sup_lambda  (2/lambda^2) log E[exp(lambda X_j)]
-    where X_j = (B z_t)_j centered to zero mean.
+    Moment estimate: tightest lower bound across k=1,2,3 from
+        sigma >= (E[X^{2k}] / (2k-1)!!)^{1/(2k)}
+
+    Tail estimate: invert the tail bound P(|X|>t) <= 2 exp(-t^2/(2 sigma^2))
+    at every empirical order statistic and take the max over the upper fifth.
     """
-    m = disc_samples.shape[1]
-    worst = 0.0
-    for j in range(m):
-        s = disc_samples[:, j] - disc_samples[:, j].mean()
-        for lam in lam_grid:
-            val = 2.0 * stable_log_mgf(s, lam) / (lam ** 2)
-            if val > worst:
-                worst = val
-    return worst
+    N = len(vals)
+    sigma_mom = max(
+        np.mean(vals ** 2) ** 0.5,           # k=1, (2k-1)!! = 1
+        (np.mean(vals ** 4) / 3) ** 0.25,    # k=2, (2k-1)!! = 3
+        (np.mean(vals ** 6) / 15) ** (1/6),  # k=3, (2k-1)!! = 15
+    )
+
+    abs_sorted = np.sort(np.abs(vals))[::-1]          # descending order stats
+    ranks = np.arange(1, N + 1, dtype=float)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        sigma_candidates = abs_sorted / np.sqrt(2 * np.log(2 * N / ranks))
+    # only look at the upper tail (top 20%) to avoid log≈0 instability near median
+    sigma_tail = float(np.nanmax(sigma_candidates[: max(1, N // 5)]))
+
+    return sigma_mom, sigma_tail
 
 
-def _single_gsw(B_f64, mantissa_bits, seed):
-    """Run one GSW and return the discrepancy row (in float64)."""
-    z = gram_schmidt_walk(B_f64, seed=seed, mantissa_bits=mantissa_bits)
-    return B_f64 @ z
+def precision_sweep(m: int, n: int, num_samples: int = 1000) -> None:
+    """Sweep mantissa bits 2–52 (exp fixed at 11); plot mean discrepancy and subgaussianity."""
+    sig_range = range(2, 53, 5)
+    mean_discrepancies = []
+    sigma_moms  = []
+    sigma_tails = []
 
+    for sig_bits in tqdm(sig_range, desc="sig_bits"):
+        inf_norms = np.zeros(num_samples)
+        Bz_all = []
+        for i in tqdm(range(num_samples), desc=f"  sig_bits={sig_bits:2d}", leave=False):
+            r = _one_sample(m, n, sig_bits)
+            inf_norms[i] = np.abs(r.Bz).max()
+            Bz_all.append(r.Bz)
 
-def run_one(n, m, mantissa_bits, num_samples, lam_grid, seed=0):
-    """Run GSW num_samples times at the given precision, return sigma^2."""
-    rng = np.random.default_rng(seed)
+        mean_discrepancies.append(inf_norms.mean())
+        sigma_mom, sigma_tail = _subgaussian_sigma(np.concatenate(Bz_all))
+        sigma_moms.append(sigma_mom)
+        sigma_tails.append(sigma_tail)
 
-    B_f64 = rng.standard_normal((m, n))
-    B_f64 /= np.linalg.norm(B_f64, axis=0, keepdims=True)
+    sig_list = list(sig_range)
+    fig, (ax_disc, ax_sg) = plt.subplots(1, 2, figsize=(10, 4))
+    fig.suptitle(f"GSW precision sweep  —  B: ({m}×{n}), {num_samples} samples, exp_bits={EXP_BITS}")
 
-    seeds = rng.integers(2**62, size=num_samples)
-    with Pool() as pool:
-        rows = pool.starmap(_single_gsw,
-                            [(B_f64, mantissa_bits, int(s)) for s in seeds])
-    disc = np.array(rows)
+    ax_disc.plot(sig_list, mean_discrepancies, marker="o", markersize=3)
+    ax_disc.set_xlabel("mantissa bits (sig_bits)")
+    ax_disc.set_ylabel("mean ‖Bz‖∞")
+    ax_disc.axhline(0.0, color="gray", linestyle="--", linewidth=0.8, label="ideal (0)")
+    ax_disc.legend()
 
-    return estimate_sigma_sq(disc, lam_grid)
+    ax_sg.plot(sig_list, sigma_moms,  marker="o", markersize=3, label="moments")
+    ax_sg.plot(sig_list, sigma_tails, marker="s", markersize=3, label="tails")
+    ax_sg.set_xlabel("mantissa bits (sig_bits)")
+    ax_sg.set_ylabel("estimated σ  (subgaussian parameter)")
+    ax_sg.legend()
 
+    fig.tight_layout()
+    fig.savefig("precision_sweep.png", dpi=150)
+    plt.show()
 
-# ------------------------------------------------------------------ #
-#  Main sweep
-# ------------------------------------------------------------------ #
 
 if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-
-    m = 16
-    #n_values = [20, 50, 100, 500, 1000]
-    n_values = [300]
-    bits_values = [10, 14, 18, 23, 30, 40, 52]  # 10=~float16, 23=float32, 52=float64
-    #bits_values = [10, 18, 30, 52]  # 10=~float16, 23=float32, 52=float64
-    num_samples = 1000
-    lam_grid = np.linspace(0.1, 5.0, 25)
-
-    # results[n] = list of sigma^2 for each bits value
-    results = {n: [] for n in n_values}
-
-    for n in n_values:
-        for bits in bits_values:
-            print(f"n={n:4d}  bits={bits:2d} ... ", end="", flush=True)
-            sig2 = run_one(n, m, bits, num_samples, lam_grid, seed=n)
-            results[n].append(sig2)
-            print(f"sigma^2 = {sig2:.4f}")
-
-    # -------------------------------------------------------------- #
-    #  Plot: one line per n, x = mantissa bits, y = sigma^2
-    # -------------------------------------------------------------- #
-    fig, ax = plt.subplots(figsize=(8, 5))
-    for n in n_values:
-        ax.plot(bits_values, results[n], "o-", lw=2, ms=7, label=f"$n={n}$")
-
-    ax.axhline(1.0, color="gray", ls=":", lw=1.5,
-               label=r"$\sigma^2 = 1$ (theory)")
-    # mark the standard float widths
-    for bval, lbl in [(10, "f16"), (23, "f32"), (52, "f64")]:
-        ax.axvline(bval, color="k", ls="--", lw=0.8, alpha=0.4)
-        ax.text(bval + 0.5, ax.get_ylim()[0], lbl, fontsize=9,
-                va="bottom", alpha=0.6)
-
-    ax.set_xlabel("mantissa bits", fontsize=12)
-    ax.set_ylabel(r"$\hat\sigma^2$  (empirical MGF bound)", fontsize=12)
-    ax.set_title(
-        rf"GSW sub-Gaussian parameter vs precision  ($m={m}$, "
-        f"{num_samples} samples)",
-        fontsize=13,
-    )
-    ax.legend(fontsize=11)
-    ax.grid(True, alpha=0.3)
-
-    plt.tight_layout()
-    plt.savefig("precision_sweep.png", dpi=150, bbox_inches="tight")
-    print(f"\nPlot saved to precision_sweep.png")
-    plt.show()
+    precision_sweep(m=20, n=25, num_samples=100)

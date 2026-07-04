@@ -2,17 +2,17 @@ import numpy as np
 from dataclasses import dataclass, field
 from typing import Callable
 
+import lpla
+
 
 @dataclass
 class WalkResult:
     assignment: np.ndarray
-    # min over iterations of E[delta_t^2] = d_plus * d_minus
-    min_second_moment: float
     # weighted sum of input columns by final assignment: B @ assignment
     Bz: np.ndarray
-    # Each entry is (z_before_step, u, delta_t, second_moment). Only populated
-    # when gram_schmidt_walk is called with record_trajectory=True.
-    trajectory: list[tuple[np.ndarray, np.ndarray, float, float]] = field(default_factory=list)
+    # Each entry is (z_before_step, u, delta_t). Only populated when
+    # gram_schmidt_walk is called with record_trajectory=True.
+    trajectory: list[tuple[np.ndarray, np.ndarray, float]] = field(default_factory=list)
 
 
 def gram_schmidt_walk(
@@ -25,8 +25,10 @@ def gram_schmidt_walk(
     Gram-Schmidt Walk (Algorithm 1).
 
     B:     (m, n) matrix with unit-norm columns
-    chop:  optional callable that rounds an array to a reduced-precision format;
-           applied to the inputs and output of each lstsq solve
+    chop:  optional callable that rounds an array to a reduced-precision format.
+           When given, the least-squares direction is computed by lpla.lstsq, a
+           hand-rolled Householder QR/LQ solver in which every arithmetic operation
+           is rounded to the target format (not just the solve's inputs/output).
     noise: optional callable(n) -> ndarray; its output is added to z after each
            step, and z is clamped back to [-1, 1]^n before the next iteration.
            Example: lambda n: np.random.normal(0, 0.01, n)
@@ -35,7 +37,6 @@ def gram_schmidt_walk(
     _, n = B.shape
     z = np.zeros(n)
     p = np.random.randint(n)
-    min_second_moment = float('inf')
     trajectory = []
 
     while True:
@@ -52,19 +53,13 @@ def gram_schmidt_walk(
         u = np.zeros(n)
         u[p] = 1.0
         if len(free) > 0:
-            B_free = B[:, free]
-            b_p    = B[:, p]
             if chop is not None:
-                with np.errstate(over='ignore'):
-                    B_free = chop(B_free.copy())
-                    b_p    = chop(b_p.copy())
-            v, _, _, _ = np.linalg.lstsq(B_free, -b_p, rcond=None)
-            if chop is not None:
-                with np.errstate(over='ignore'):
-                    v = chop(v)
-                # Overflow at low precision produces inf/nan; zero those entries so
-                # the step falls back to the pivot direction for affected coordinates.
-                v = np.nan_to_num(v, nan=0.0, posinf=0.0, neginf=0.0)
+                # Every op in the solve runs at the target precision. Overflow at low
+                # precision yields inf/nan, which lpla.lstsq zeros out so the step
+                # falls back to the pivot direction for affected coordinates.
+                v = lpla.lstsq(B[:, free], -B[:, p], chop)
+            else:
+                v, _, _, _ = np.linalg.lstsq(B[:, free], -B[:, p], rcond=None)
             u[free] = v
 
         # Feasible step interval Delta = {delta : z + delta*u in [-1,1]^n}
@@ -80,14 +75,10 @@ def gram_schmidt_walk(
         if total < 1e-15:
             break
 
-        # E[delta_t^2] = d_plus * d_minus  (second moment of the two-point distribution)
-        second_moment = d_plus * d_minus
-        min_second_moment = min(min_second_moment, second_moment)
-
         # Martingale-preserving random step: E[delta_t] = 0
         delta_t = d_plus if np.random.random() < d_minus / total else -d_minus
         if record_trajectory:
-            trajectory.append((z.copy(), u.copy(), delta_t, second_moment))
+            trajectory.append((z.copy(), u.copy(), delta_t))
 
         z += delta_t * u
         if noise is not None:
@@ -99,7 +90,6 @@ def gram_schmidt_walk(
     assignment = np.sign(z).astype(int)
     return WalkResult(
         assignment=assignment,
-        min_second_moment=min_second_moment,
         Bz=B @ assignment,
         trajectory=trajectory if record_trajectory else [],
     )

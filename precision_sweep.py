@@ -5,16 +5,16 @@ import matplotlib
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import numpy as np
-from pychop import Chop
 from tqdm import tqdm
 
 import gsw
+import lpla
 
 EXP_BITS = 11  # fixed; matches fp64 exponent width
 
 
 def _one_sample(B: np.ndarray, sig_bits: int) -> gsw.WalkResult:
-    chop = None if sig_bits == 52 else Chop(EXP_BITS, sig_bits)
+    chop = None if sig_bits == 52 else lpla.make_round(EXP_BITS, sig_bits)
     noise = lambda size: np.random.normal(0.0, 2**(-32), size)
     return gsw.gram_schmidt_walk(B, chop=chop, noise=noise)
 

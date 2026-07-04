@@ -1,0 +1,7 @@
+Step-landing epsilon  (m=30, n=200, sig_bits=5, samples=100)
+unit roundoff u = 2^-(sig_bits+1) = 1.562e-02
+pooled per-coordinate additive epsilon (rounding step - ideal step):
+  direction eps          mean=-1.649e-04  std=7.944e+00  Q1=-1.824e-03  med=-5.709e-06  Q3=+1.811e-03
+  z-space eps (delta*eps) mean=-2.629e-06  std=1.374e-02  Q1=-1.409e-03  med=-2.243e-06  Q3=+1.405e-03
+  -> effective additive-noise sigma (z-space) = 1.374e-02  (compare to sweep noise_std, e.g. 2^-8=3.906e-03, 2^-10=9.766e-04)
+saved results/step_landing_m30_n200_s5.png

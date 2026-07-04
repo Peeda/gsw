@@ -1,20 +1,16 @@
 import os
 os.environ.setdefault("chop_backend", "numpy")
+# single-threaded BLAS so parallel rollout workers don't oversubscribe the cores
+for _v in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ.setdefault(_v, "1")
 
 import matplotlib
-matplotlib.use("TkAgg")
+matplotlib.use("Agg")  # non-interactive: save figures, never pop up a window
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-import gsw
-import lpla
-
-
-def _one_sample(B: np.ndarray, sig_bits: int) -> gsw.WalkResult:
-    chop = None if sig_bits == 52 else lpla.make_round(sig_bits)
-    noise = lambda size: np.random.normal(0.0, 2**(-32), size)
-    return gsw.gram_schmidt_walk(B, chop=chop, noise=noise)
+import rollouts
 
 
 def _test_directions(B: np.ndarray, num_random: int = 20) -> np.ndarray:
@@ -55,8 +51,12 @@ def _subgaussian_sigma(vals: np.ndarray) -> tuple[float, float]:
     return sigma_mom, sigma_tail
 
 
-def precision_sweep(m: int, n: int, num_samples: int = 1000) -> None:
-    """Sweep mantissa bits 2–52; plot mean of Bz (dim 0) and subgaussianity."""
+def precision_sweep(m: int, n: int, num_samples: int = 1000, *, workers: int | None = None) -> None:
+    """Sweep mantissa bits 2–52; plot mean of Bz (dim 0) and subgaussianity.
+
+    workers: number of processes for the Monte-Carlo rollouts (default ≈ physical cores;
+    pass workers=1 to run serially).
+    """
     u = np.random.randn(m); u /= np.linalg.norm(u)
     epsilon = 1 / np.sqrt(m)
     B = u[:, None] + epsilon * np.random.randn(m, n)
@@ -76,14 +76,11 @@ def precision_sweep(m: int, n: int, num_samples: int = 1000) -> None:
     directions = _test_directions(B)  # (D, m)
 
     for sig_bits in tqdm(sig_range, desc="sig_bits"):
-        bz_means = np.zeros(num_samples)
-        projections = np.zeros((len(directions), num_samples))  # (D, N)
-
-        for i in tqdm(range(num_samples), desc=f"  sig_bits={sig_bits:2d}", leave=False):
-            r = _one_sample(B, sig_bits)
-            bz_means[i] = r.Bz.mean(axis=0)
-            projections[:, i] = directions @ r.Bz  # project onto each direction
-
+        bz_means, projections = rollouts.run_samples(
+            B, directions, num_samples,
+            sig_bits=None if sig_bits == 52 else sig_bits,
+            noise_std=2**(-32), workers=workers,
+        )
         mean_discrepancies.append(bz_means.mean())
 
         # Max subgaussian parameter over all test directions
@@ -113,7 +110,8 @@ def precision_sweep(m: int, n: int, num_samples: int = 1000) -> None:
 
     fig.tight_layout()
     fig.savefig("precision_sweep.png", dpi=150)
-    plt.show()
+    plt.close(fig)
+    print("saved precision_sweep.png")
 
 
 if __name__ == "__main__":

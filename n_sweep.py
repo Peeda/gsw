@@ -1,14 +1,16 @@
 import os
 os.environ.setdefault("chop_backend", "numpy")
+# single-threaded BLAS so parallel rollout workers don't oversubscribe the cores
+for _v in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ.setdefault(_v, "1")
 
 import matplotlib
-matplotlib.use("TkAgg")
+matplotlib.use("Agg")  # non-interactive: save figures, never pop up a window
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-import gsw
-import lpla
+import rollouts
 
 
 def _test_directions(B: np.ndarray, num_random: int = 20) -> np.ndarray:
@@ -57,6 +59,7 @@ def n_sweep(
     sig_bits: int | None = None,
     noise_mean: float = 0.0,
     noise_std: float = 0.0,
+    workers: int | None = None,
 ) -> None:
     """Sweep n with fixed m; supports chop mode (sig_bits) or noise mode (noise_mean/noise_std), not both.
 
@@ -67,14 +70,14 @@ def n_sweep(
         fp16:      sig_bits=10
         bfloat16:  sig_bits=7
         fp32:      sig_bits=23
+
+    workers: number of processes for the Monte-Carlo rollouts (default ≈ physical cores;
+    pass workers=1 to run serially).
     """
     has_chop  = sig_bits is not None
     has_noise = noise_mean != 0.0 or noise_std != 0.0
     if has_chop and has_noise:
         raise ValueError("specify either sig_bits or noise parameters, not both")
-
-    chop  = lpla.make_round(sig_bits) if has_chop else None
-    noise = (lambda size: np.random.normal(noise_mean, noise_std, size)) if has_noise else None
 
     if has_chop:
         desc = f"mantissa={sig_bits} bits"
@@ -96,14 +99,11 @@ def n_sweep(
         B /= np.linalg.norm(B, axis=0)
 
         directions = _test_directions(B)  # (D, m)
-        bz_means = np.zeros(num_samples)
-        projections = np.zeros((len(directions), num_samples))
-
-        for i in tqdm(range(num_samples), desc=f"  n={n}", leave=False):
-            r = gsw.gram_schmidt_walk(B, chop=chop, noise=noise)
-            bz_means[i] = r.Bz.mean()
-            projections[:, i] = directions @ r.Bz
-
+        bz_means, projections = rollouts.run_samples(
+            B, directions, num_samples,
+            sig_bits=sig_bits, noise_mean=noise_mean, noise_std=noise_std,
+            workers=workers,
+        )
         mean_discrepancies.append(bz_means.mean())
 
         sigma_mom_max = sigma_tail_max = 0.0
@@ -144,6 +144,7 @@ def mn_sweep(
     sig_bits: int | None = None,
     noise_mean: float = 0.0,
     noise_std: float = 0.0,
+    workers: int | None = None,
 ) -> None:
     """Sweep N with m=n=N (square B); supports chop mode (sig_bits) or noise mode (noise_mean/noise_std), not both.
 
@@ -154,14 +155,14 @@ def mn_sweep(
         fp16:      sig_bits=10
         bfloat16:  sig_bits=7
         fp32:      sig_bits=23
+
+    workers: number of processes for the Monte-Carlo rollouts (default ≈ physical cores;
+    pass workers=1 to run serially).
     """
     has_chop  = sig_bits is not None
     has_noise = noise_mean != 0.0 or noise_std != 0.0
     if has_chop and has_noise:
         raise ValueError("specify either sig_bits or noise parameters, not both")
-
-    chop  = lpla.make_round(sig_bits) if has_chop else None
-    noise = (lambda size: np.random.normal(noise_mean, noise_std, size)) if has_noise else None
 
     if has_chop:
         desc = f"mantissa={sig_bits} bits"
@@ -183,14 +184,11 @@ def mn_sweep(
         B /= np.linalg.norm(B, axis=0)
 
         directions = _test_directions(B)  # (D, N)
-        bz_means = np.zeros(num_samples)
-        projections = np.zeros((len(directions), num_samples))
-
-        for i in tqdm(range(num_samples), desc=f"  N={N}", leave=False):
-            r = gsw.gram_schmidt_walk(B, chop=chop, noise=noise)
-            bz_means[i] = r.Bz.mean()
-            projections[:, i] = directions @ r.Bz
-
+        bz_means, projections = rollouts.run_samples(
+            B, directions, num_samples,
+            sig_bits=sig_bits, noise_mean=noise_mean, noise_std=noise_std,
+            workers=workers,
+        )
         mean_discrepancies.append(bz_means.mean())
 
         sigma_mom_max = sigma_tail_max = 0.0
@@ -230,7 +228,7 @@ if __name__ == "__main__":
     # 1) a bit precision sweep in the n >> d regime just to confirm things
     # so maybe let's do up to 1500
     n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-9))
-    n_sweep(m, n_values, 200, sig_bits=8)
+    # n_sweep(m, n_values, 200, sig_bits=8)
     # then I'm interested in sweeping over m and n with some noise, let's do 1/256
     N_values = range(250, 2001, 250)
     mn_sweep(N_values, num_samples, noise_mean=0.0, noise_std=2**(-8))

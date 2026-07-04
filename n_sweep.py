@@ -55,30 +55,30 @@ def n_sweep(
     num_samples: int = 250,
     *,
     sig_bits: int | None = None,
-    exp_bits: int = 11,
     noise_mean: float = 0.0,
     noise_std: float = 0.0,
 ) -> None:
-    """Sweep n with fixed m; supports chop mode (exp_bits+sig_bits) or noise mode (noise_mean/noise_std), not both.
+    """Sweep n with fixed m; supports chop mode (sig_bits) or noise mode (noise_mean/noise_std), not both.
 
-    Standard format parameters:
-        fp8 E4M3:  exp_bits=4, sig_bits=3
-        fp8 E5M2:  exp_bits=5, sig_bits=2
-        fp16:      exp_bits=5, sig_bits=10
-        bfloat16:  exp_bits=8, sig_bits=7
-        fp32:      exp_bits=8, sig_bits=23
+    sig_bits is the number of mantissa bits kept in the rounding (exponent unbounded).
+    Mantissa bits per standard format:
+        fp8 E4M3:  sig_bits=3
+        fp8 E5M2:  sig_bits=2
+        fp16:      sig_bits=10
+        bfloat16:  sig_bits=7
+        fp32:      sig_bits=23
     """
     has_chop  = sig_bits is not None
     has_noise = noise_mean != 0.0 or noise_std != 0.0
     if has_chop and has_noise:
         raise ValueError("specify either sig_bits or noise parameters, not both")
 
-    chop  = lpla.make_round(exp_bits, sig_bits) if has_chop else None
+    chop  = lpla.make_round(sig_bits) if has_chop else None
     noise = (lambda size: np.random.normal(noise_mean, noise_std, size)) if has_noise else None
 
     if has_chop:
-        desc = f"chop=e{exp_bits}m{sig_bits} ({1 + exp_bits + sig_bits}-bit)"
-        tag  = f"chop_e{exp_bits}m{sig_bits}"
+        desc = f"mantissa={sig_bits} bits"
+        tag  = f"m{sig_bits}"
     else:
         desc = f"noise=N({noise_mean}, {noise_std})"
         tag  = f"noise_N({noise_mean},{noise_std})"
@@ -142,30 +142,30 @@ def mn_sweep(
     num_samples: int = 250,
     *,
     sig_bits: int | None = None,
-    exp_bits: int = 11,
     noise_mean: float = 0.0,
     noise_std: float = 0.0,
 ) -> None:
-    """Sweep N with m=n=N (square B); supports chop mode (exp_bits+sig_bits) or noise mode (noise_mean/noise_std), not both.
+    """Sweep N with m=n=N (square B); supports chop mode (sig_bits) or noise mode (noise_mean/noise_std), not both.
 
-    Standard format parameters:
-        fp8 E4M3:  exp_bits=4, sig_bits=3
-        fp8 E5M2:  exp_bits=5, sig_bits=2
-        fp16:      exp_bits=5, sig_bits=10
-        bfloat16:  exp_bits=8, sig_bits=7
-        fp32:      exp_bits=8, sig_bits=23
+    sig_bits is the number of mantissa bits kept in the rounding (exponent unbounded).
+    Mantissa bits per standard format:
+        fp8 E4M3:  sig_bits=3
+        fp8 E5M2:  sig_bits=2
+        fp16:      sig_bits=10
+        bfloat16:  sig_bits=7
+        fp32:      sig_bits=23
     """
     has_chop  = sig_bits is not None
     has_noise = noise_mean != 0.0 or noise_std != 0.0
     if has_chop and has_noise:
         raise ValueError("specify either sig_bits or noise parameters, not both")
 
-    chop  = lpla.make_round(exp_bits, sig_bits) if has_chop else None
+    chop  = lpla.make_round(sig_bits) if has_chop else None
     noise = (lambda size: np.random.normal(noise_mean, noise_std, size)) if has_noise else None
 
     if has_chop:
-        desc = f"chop=e{exp_bits}m{sig_bits} ({1 + exp_bits + sig_bits}-bit)"
-        tag  = f"chop_e{exp_bits}m{sig_bits}"
+        desc = f"mantissa={sig_bits} bits"
+        tag  = f"m{sig_bits}"
     else:
         desc = f"noise=N({noise_mean}, {noise_std})"
         tag  = f"noise_N({noise_mean},{noise_std})"
@@ -225,12 +225,18 @@ def mn_sweep(
 
 
 if __name__ == "__main__":
-    m, n_values, num_samples = 30, range(500, 3001, 500), 250
-    N_values = range(25, 201, 50)
-    mn_sweep(N_values, num_samples, noise_mean=-2**(-16), noise_std=0.0)
+    m, n_values, num_samples = 30, range(250, 2001, 250), 250
+    # okay for today I want
+    # 1) a bit precision sweep in the n >> d regime just to confirm things
+    # so maybe let's do up to 1500
+    n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-9))
+    n_sweep(m, n_values, 200, sig_bits=8)
+    # then I'm interested in sweeping over m and n with some noise, let's do 1/256
+    N_values = range(250, 2001, 250)
+    mn_sweep(N_values, num_samples, noise_mean=0.0, noise_std=2**(-8))
     # n_sweep(m, n_values, num_samples, noise_mean=-2**(-10), noise_std=0.0)
     # n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-8))
-    # n_sweep(m, n_values, num_samples, sig_bits=3,  exp_bits=4)  # fp8 E4M3
-    # n_sweep(m, n_values, num_samples, sig_bits=2,  exp_bits=5)  # fp8 E5M2
-    # n_sweep(m, n_values, num_samples, sig_bits=10, exp_bits=5)  # fp16
-    # n_sweep(m, n_values, num_samples, sig_bits=7,  exp_bits=8)  # bfloat16
+    # n_sweep(m, n_values, num_samples, sig_bits=3)   # fp8 E4M3 mantissa
+    # n_sweep(m, n_values, num_samples, sig_bits=2)   # fp8 E5M2 mantissa
+    # n_sweep(m, n_values, num_samples, sig_bits=10)  # fp16 mantissa
+    # n_sweep(m, n_values, num_samples, sig_bits=7)   # bfloat16 mantissa

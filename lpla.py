@@ -7,8 +7,7 @@ layer (rounds only a reduction's inputs/outputs). This is aimed at studying how
 mantissa rounding affects the Gram-Schmidt Walk, not at bit-exact hardware emulation:
 
   * Only the *mantissa* is modeled (round to `sig_bits` fraction bits). The exponent
-    range is unbounded, so overflow/underflow never occur — a deliberate simplification
-    (`exp_bits` is accepted for API compatibility but ignored).
+    range is unbounded, so overflow/underflow never occur — a deliberate simplification.
   * Products are rounded, but reductions (dot / matvec / norm) accumulate in float64
     and round once. Every op is thus reduced-precision, but the exact accumulation
     order — a second-order detail — is left to BLAS, which keeps it fast.
@@ -21,15 +20,15 @@ inputs; see the __main__ block for the correctness check.
 import numpy as np
 
 
-def make_round(exp_bits, sig_bits):
+def make_round(sig_bits):
     """Return a fast round-to-nearest-even *mantissa* rounder (`sig_bits` fraction bits).
 
     Rounds each value's significand to `sig_bits` fraction bits via frexp/ldexp — a
     handful of vectorized C ops — with an unbounded exponent, so overflow never happens.
-    `exp_bits` is ignored (kept only so callers can pass a format's (exp, sig) pair).
-
-    For in-range values this matches an IEEE (exp_bits, sig_bits) format's rounding
-    exactly; it simply never overflows or produces subnormal flush-to-zero.
+    Only mantissa precision is modeled; the exponent range (and thus overflow/subnormal
+    behavior) is deliberately not, since this is for studying the effect of rounding, not
+    bit-exact hardware emulation. For in-range values this matches the rounding of an IEEE
+    format with `sig_bits` fraction bits.
     """
     step = 2.0 ** (sig_bits + 1)   # significand quantization (m in [0.5,1) -> sig_bits frac bits)
 

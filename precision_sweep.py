@@ -10,11 +10,9 @@ from tqdm import tqdm
 import gsw
 import lpla
 
-EXP_BITS = 11  # fixed; matches fp64 exponent width
-
 
 def _one_sample(B: np.ndarray, sig_bits: int) -> gsw.WalkResult:
-    chop = None if sig_bits == 52 else lpla.make_round(EXP_BITS, sig_bits)
+    chop = None if sig_bits == 52 else lpla.make_round(sig_bits)
     noise = lambda size: np.random.normal(0.0, 2**(-32), size)
     return gsw.gram_schmidt_walk(B, chop=chop, noise=noise)
 
@@ -58,7 +56,7 @@ def _subgaussian_sigma(vals: np.ndarray) -> tuple[float, float]:
 
 
 def precision_sweep(m: int, n: int, num_samples: int = 1000) -> None:
-    """Sweep mantissa bits 2–52 (exp fixed at 11); plot mean of Bz (dim 0) and subgaussianity."""
+    """Sweep mantissa bits 2–52; plot mean of Bz (dim 0) and subgaussianity."""
     u = np.random.randn(m); u /= np.linalg.norm(u)
     epsilon = 1 / np.sqrt(m)
     B = u[:, None] + epsilon * np.random.randn(m, n)
@@ -99,7 +97,7 @@ def precision_sweep(m: int, n: int, num_samples: int = 1000) -> None:
 
     sig_list = list(sig_range)
     fig, (ax_disc, ax_sg) = plt.subplots(1, 2, figsize=(10, 4))
-    fig.suptitle(f"GSW precision sweep  —  B: ({m}×{n}), {num_samples} samples, exp_bits={EXP_BITS}")
+    fig.suptitle(f"GSW precision sweep  —  B: ({m}×{n}), {num_samples} samples")
 
     ax_disc.plot(sig_list, mean_discrepancies, marker="o", markersize=3)
     ax_disc.set_xlabel("mantissa bits (sig_bits)")

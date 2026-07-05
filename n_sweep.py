@@ -223,17 +223,18 @@ def mn_sweep(
 
 
 if __name__ == "__main__":
-    m, n_values, num_samples = 30, range(250, 2001, 250), 250
+    m, n_values, num_samples = 30, range(250, 2001, 250), 200
     # okay for today I want
     # 1) a bit precision sweep in the n >> d regime just to confirm things
     # so maybe let's do up to 1500
-    n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-9))
+    # n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-9))
     # n_sweep(m, n_values, 200, sig_bits=8)
     # then I'm interested in sweeping over m and n with some noise, let's do 1/256
-    N_values = range(250, 2001, 250)
+    N_values = range(200, 1001, 200)
     mn_sweep(N_values, num_samples, noise_mean=0.0, noise_std=2**(-8))
+    m, n_values, num_samples = 1000, range(250, 1001, 200), 200
+    n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-8))
     # n_sweep(m, n_values, num_samples, noise_mean=-2**(-10), noise_std=0.0)
-    # n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-8))
     # n_sweep(m, n_values, num_samples, sig_bits=3)   # fp8 E4M3 mantissa
     # n_sweep(m, n_values, num_samples, sig_bits=2)   # fp8 E5M2 mantissa
     # n_sweep(m, n_values, num_samples, sig_bits=10)  # fp16 mantissa

@@ -224,8 +224,9 @@ def mn_sweep(
 
 if __name__ == "__main__":
     m, n_values, num_samples = 30, range(250, 2001, 250), 200
-    n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-16))
-    # n_sweep(m, n_values, 200, sig_bits=8)
+    n_sweep(m, n_values, num_samples, noise_mean=-2**(-16), noise_std=0.0)
+    # n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-10))
+    # n_sweep(m, n_values, 200, sig_bits=3)
     N_values = range(200, 1001, 200)
     # mn_sweep(N_values, num_samples, noise_mean=0.0, noise_std=2**(-8))
     # n_sweep(m, n_values, num_samples, noise_mean=-2**(-10), noise_std=0.0)

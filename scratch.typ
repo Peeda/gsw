@@ -1,106 +1,65 @@
 #let inner(l, r) = $chevron.l #l, #r chevron.r$
-#let zpos(t) = $z_(#t) (p)$
-#let pos = $z_(t-1) (p)$
-#let ept = $epsilon_t$
-#let ep = $epsilon_t (p)$
-#let tbar = $ norm(Pi_(R_t \/ V_t) (theta))_2 $
-update rule:
-$ z_t = z_(t-1) (p) + delta_t u_t + ept $
-$ zpos(t) = pos + delta_t u_t (p) + ept (p) = pos + delta_t + ept (p) $
-martingale differences:
-we have update rule
-#let c4 = $c_4$
-$ X_t = delta_t inner(B u_t, theta) - c4 (zpos(t)^2 - zpos(t-1)^2)tbar^2 \
-= delta_t inner(B u_t, theta) - c4 ((pos^2 + delta_t^2 + ep^2 + 2 delta_t pos + 2 delta_t ep + 2 pos ep) - pos^2)tbar^2 \
-= delta_t inner(B u_t, theta) - c4 (delta_t^2 + ep^2 + 2 delta_t pos + 2 delta_t ep + 2 pos ep)tbar^2 $
+= Setup
+We massage the update rule as follows
+$ (delta_t u_t + epsilon_t) = (delta_t + epsilon_t (p))u_t - epsilon_t (p) u_t $
+to get
+#let dt = $delta_t + epsilon_t (p)$
+$ B(z - z_0) = B sum_t (dt u_t + epsilon_t - epsilon_t (p)u_t) = 
+\ B sum_t (dt u_t) + B sum_t epsilon_t - epsilon_t (p) u_t $
+Let's focus on the first term and proceed under the assumption that that second part is bounded, collecting it later either using Orlicz norm stuff or just Cauchy Schwarz and absorbing it as a linear term in the mgf
 
-// NOTE: From here I won't use the above variables again except for c4, and I'm redefining tbar, ep
+// TODO: decide how we want to notate the pivot b_(pt), maybe we'd prefer consistency with BDGL
+#let wr = $w_sigma(r)$
+#let ar = $inner(wr, v)$
+#let br = $inner(wr, b_(p t))$
+#let update = $(dt inner(B u_t, v))$
+#let sum2 = $sum_(s in S_p) sum_(r in Q_s)$
+To show that $B sum_t (dt) u_t$ is $1$-subgaussian, we want $forall v in RR^d$ that we have
+$ EE [exp(inner(B sum_t (dt) u_t, v))] <= exp(1/2 norm(v)^2) $
+using linearity to rearrange the inner product on the left hand side, and moving the right hand side to the left, it suffices to show
+$ EE [exp((sum_t (dt) inner(B u_t, v))-1/2 norm(v)^2)] <= 1 $
+Because ${w_sigma(r)}$ forms an orthonormal basis (assuming B is full column rank) we can write $norm(v)^2 = sum_(r=1)^n inner(wr, v)^2$ so it suffices to show
+$ EE [exp(sum_t update - 1/2 sum_r ar^2)] <= 1 $
+Letting $Q_t$ denote the set of indices $r$ such that $b_r$ is decided in iteration $t$, we can group the summations over pivot phases as follows:
+// $ EE [exp(sum_(S_p) (sum_(t in S_p) ((dt) inner(B u_t, v) - 1/2 sum_(r in Q_t) ar^2)))] <= 1 $
+$ EE [exp(sum_(S_p) (sum_(t in S_p) update - 1/2 sum2 ar^2))] <= 1 $
+it is therefore clear that it suffices to show for each pivot phase $S_p$, with $Delta_(S_p)$ denoting randomness up to $S_p$, that
+$ EE [exp(sum_(t in S_p) (update - 1/2 sum2 ar^2)) bar Delta_(S_p)] <= 1 $
+and noting that $norm(b_( p t)) <= 1$ implies $sum_(s in S_p) sum_(r in Q_s) br^2 <= 1$, it suffices to show the stronger inequality
 
-#let tbar = $ overline(theta)_t $
-#let dt = $ delta_t $
-#let ep = $ epsilon $
-#let eiter = $epsilon_"iter"$
-#let c100 = $c_100$
-#let c8 = $c_8$
-Following the conventions of (citation here of the blues paper) we make use of the following notation for clarity, and in addition we write $epsilon$ for $epsilon_t (p)$
-// TODO: this spacing is not good there's probably a good way to do this
-$ x := pos "  " overline(theta)_t = norm(Pi_(R_t \/ V_t) (theta))_2 "  " theta_t = inner(B u_t, theta) $
+// TODO: for measurability reasons that are not yet clear to me you need to put
+// the "damping" inside the left hand side
 
-we can therefore rerwite the above expression as
-$
-  X_t = delta_t theta_t - c4 (dt^2 + 2 dt x + epsilon^2 + 2 dt epsilon + 2 x epsilon) tbar^2\ 
-  = dt theta_t - c4(dt^2 + 2 dt x) tbar^2 - c4 (ep^2 + 2 dt ep + 2 x ep) tbar^2
-$
-
-#let ee(expr) = $EE_(t-1) [#expr]$
-where the final term is the contribution of the additional $epsilon$ in the update rule, and the first two terms match the expression of the original algorithm. 
-We first establish that $abs(X_t) <= 1$, and to that end note the following bounds from (cite blues paper) that we will use throughout this section.
-
-We have $x in [-1,1]$ and $x + dt = z_(t-1)(p) + delta_t u_t (p) in [-1,1]$, with the second inequality holding in this setting
-as $z_(t-1)(p) + delta_t u_t (p)$ is the ideal choice of step before adding in noise. 
-We therefore have $abs(dt + 2 x) = abs((dt + x) + x) <= 2$.
-We also note that $abs(dt) <= 2$ as mentioned in the previous section.
-Furthermore we observe $abs(ep + 2 dt + 2 x) <= abs(ep) + 2 abs(dt + x) <= 1 + 2= 3$ 
-where we used $abs(ep) <= eiter <= 1$. Finally, we will use the fact that $theta_t <= tbar <= 1/c8$. 
-The first inequality follows from the fact that $theta_t = inner(B u_t, theta)$ where $B u_t in R_t slash V_t$ and $norm(B u_t)_2 <= 1$ and so
-$inner(B u_t, theta) = inner(B u_t, Pi_(R_t \/ V_t) (theta)) <= 1 dot norm(Pi_(R_t \/ V_t) (theta))_2 = tbar$.
-The latter inequality follows from the fact that in good times we assume $norm(V_(f_t - 1 \/ V_t) (theta)) <= 1 slash c8$, and $R_t in V_(f_t - 1)$
-as the pivot and any alive units at time $t$ must have been alive at time $t-1$, before the start of the current pivot phase.
-
-
-We can therefore bound $abs(X_t)$ using the established bounds:
-$
-  abs(X_t) = abs(dt theta_t - c4(dt^2 + 2 dt x) tbar^2 - c4 (ep^2 + 2 dt ep + 2 x ep) tbar^2) \
-  <= abs(dt) tbar + c4 abs(dt) abs(dt + x) tbar^2 + c4 abs(ep)abs(ep + 2 dt + 2x)tbar^2\
-  <= 2/c8 + c4 dot 2 dot 1 dot 1/c8^2 + 4 dot 1 dot 3 dot 1/c8^2 <= 1
-$
-by our choice of $c4, c8$.
-
-
+$ EE [exp(sum_(t in S_p) update - 1/2 (sum2 br^2) (sum2 ar^2)) bar Delta_(S_p)] <= 1 $
+We now reuse a lemma of Spielman which characterizes the ideal step direction $B u_t$, we have that
+$ B u_t = sum_(s in S_p \ s < t) sum_(r in Q_s) br w_sigma(r) $
+implying that
+$ inner(B u_t, v) = sum_(s in S_p \ s < t) sum_(r in Q_s) ar br $
+Defining $alpha_r = br, beta_r = ar $ and substituting the previous lemma gives
+$ EE [exp(sum_(t in S_p) (dt) sum_(s in S_p \ s < t) sum_(r in Q_s) alpha_r beta_r - 1/2 (sum2 alpha_r^2) (sum2 beta_r^2)) bar Delta_(S_p)] <= 1 $
+Now we're gonna define $g(R)$ and then we induct over $R$ to show the result, each induction step involves
+conditioning on the iterations where $s<t$ wins this minimization for the first sum
+#let sumR1 = $sum_(s in S_p \ s < t \ s <= R) sum_(r in Q_s)$
+#let sumR2 = $sum_(s in S_p \ s <= R) sum_(r in Q_s)$
+$ g(R) := EE [exp(sum_(t in S_p) (dt) sumR1 alpha_r beta_r - 1/2 (sumR2 alpha_r^2) (sumR2 beta_r^2)) bar Delta_(S_p)] <= 1 $
+= The Lemma, Actual new stuff
+To do the induction we're actually gonna condition on $Delta_R$ so that all the summations
+match, I sure do hope that I can change this to address measurability later without too much work
+$ EE [exp(sum_(t in S_p \ t > R) (dt) sumR2 alpha_r beta_r - 1/2 (sumR2 alpha_r^2) (sumR2 beta_r^2)) bar Delta_(R)] <= 1 $
+Observe that defining $x = z_(R+1) (p),$ we have $sum_(t in S_p \ t > R) (dt) in {1 - x, -1 - x}$.
+In the case where this random variable is mean zero we would take $1-x$ with probability $p = (1+x)/2$, however we assume
+#let tx = $tilde(x)$
+here we have no such assumption. We instead assume the true probability is some $(1 + tx)/2$ where $tx in [-1,1]$
+and will defer justifying the assumption $abs(tx - x) <= gamma$. Anyways this lets us take the expectation:
+$ EE [exp(sum_(t in S_p \ t > R) (dt) sumR2 alpha_r beta_r - 1/2 (sumR2 alpha_r^2) (sumR2 beta_r^2)) bar Delta_(R)] $
+$ = (1 + tx)/2 exp((1 - x)eta_R - 1/2 a_R b_R) + (1 - tx)/2 exp((-1 - x)eta_R - 1/2 a_R b_R) $
+$ = exp(tx - x) ((1 + tx)/2 exp((1 - tx)eta_R - 1/2 a_R b_R) + (1 - tx)/2 exp((-1 - tx)eta_R - 1/2 a_R b_R)) $
+$ = exp(tx -x) f_tx mat(eta_R, a_R; b_R, eta_R) $
 
 
-Our bounds on the conditional moments proceed as in (cite the blues paper here), the main choice in adapting
-the proof to this setting is the assumption $eiter <= ee(dt^2)$ for all iterations $t$ as previously mentioned.
-We use $ee(dot)$ to denote the expectation conditioned on the randomness of iterations $1,...,t-1$. 
-In particular, under this conditioning $theta_t, tbar, x, u_t$ are decided. 
-$
-  ee(X_t) &= ee(dt theta_t) - ee(c4(dt^2 + 2 dt x) tbar^2) - ee(c4 (ep^2 + 2 dt ep + 2 x ep) tbar^2) &"Defn of "X_t  \
-  &= theta_t ee(dt^2) - c4 tbar^2 ee(dt^2 + 2 dt x) - c4 tbar^2 ee(ep^2 + 2 dt ep + 2 x ep) &"Properties of "ee(dot) \
-  &= 0 - c4 tbar^2 ee(dt^2) - c4 tbar^2 ee(ep(ep + 2 dt + 2x)) &dt "is mean zero" \
-  &<= - c4 tbar^2 ee(dt^2) + c4 tbar^2 abs(ee(ep(ep + 2 dt + 2x))) &x <= abs(x) \
-  &<= - c4 tbar^2 ee(dt^2) + c4 tbar^2 ee(abs(ep(ep + 2 dt + 2x))) &"Jensen's inequality" \
-
-  &<= - c4 tbar^2 ee(dt^2) + c4 tbar^2 ee(abs(ep dot 3 )) &abs(ep) <= 1, dt + x in [-1,1] \
-  &<= - c4 tbar^2 ee(dt^2) + c4 tbar^2 eiter dot 3 &"Expectation of a bounded RV" \
-  &<= - c4 tbar^2 ee(dt^2) + (c4 dot 3)/(c100) tbar^2 ee(dt^2) & "we assume" eiter <= ee(dt^2), forall t\
-  &= (-c4 + (c4 dot 3)/c100) tbar^2 ee(dt^2)
-$
-
-Proceeding to bound the conditional second moment, we proceed as follows:
-
-
-$
-  X_t^2 &<= 2 dt^2 theta_t^2 + 2 c4^2 (underbrace(dt ^2 + 2 dt x, a) + underbrace(ep^2 + 2 x ep + 2 dt ep, "b"))^2 tbar^4 &"define" a,b "for notational clarity" \
-  &= 2 dt^2 theta_t^2 + 2 c4^2 (a^2 + b^2 + 2 a b) tbar^4 &"expanding" \
-  &= 2 dt^2 theta_t^2 + 2 c4^2 a^2 tbar^4 + 2 c4^2 (b^2 + 2 a b) tbar^4 &"splitting off terms depending on "ep \
-  &<= 2 dt^2 tbar^2 + 2 c4^2 a^2 tbar^4 + 2 c4^2 (b^2 + 2 a b) tbar^4 & abs(theta_t) <= tbar \
-  &<= 2 dt^2 tbar^2 + 2 c4^2/c8^2 a^2 tbar^2 + 2 c4^2/c8^2 (b^2 + 2 a b) tbar^2 &abs(tbar) <= 1/c8 "in good times" \
-$
-Note that $dt + 2x = (dt + x) + x$ where $dt + x in [-1,1], x in [-1,1]$ and so $abs(dt + 2x) <= abs(dt + x) + abs(x) <= 2$. This implies
-$ a^2 = (dt^2 + 2 dt x)^2 =(dt underbrace((dt + 2x), <= 2))^2 <= 4 dt ^2  $
-Now to bound the $b^2 + 2 a b$ term we notice that
-$ abs(b) = abs(ep^2 + 2 x ep + 2 dt ep) <= abs(ep (ep + 2x + 2dt)) <= 3 eiter "as before" $
-$ abs(2 a b) <= 2 abs(dt^2 + 2 dt x) dot abs(b) <= 2 abs(dt) abs(dt + 2 x) dot 3 eiter <= 2 dot 2 dot 2 dot 3 eiter <= 24 eiter $
-which gives $b^2 + 2 a b <= 9 eiter^2 + 24 eiter <= 9 eiter + 24 eiter = 33 eiter$. Plugging this in and taking the conditional expectation, we have
-$ 
-  ee(X_t^2) <= 2 ee(dt^2) tbar^2 + 2 c4^2/c8^2 (4 ee(dt^2)) tbar^2 + 2 c4^2/c8^2 (33 eiter) tbar^2 \
-  <= 2 ee(dt^2) tbar^2 + 2 c4^2/c8^2 (4 ee(dt^2)) tbar^2 + 2 c4^2/c8^2 (33 ee(dt^2) / c100) tbar^2 \
-  = tbar^2 ee(dt^2) (2 + 8 c4^2 slash c8^2 + 66c4^2 slash (c8^2 c100))
-$
-
-Combining our bounds on the first and second moments gives
-$ ee(X_t + X_t^2) <= tbar^2 ee(dt^2) (-c4 + 3c4/c100 + 2 + 8c4^2/c8^2 + 66c4^2/(c8^2 c100)) $
-and so we have $ee(X_t + X_t^2)$ for choices of $c4, c8, c100$ such that $-c4 + 3c4/c100 + 2 + 8c4^2/c8^2 + 66c4^2/(c8^2 c100) <= 0$.
-We note that in the original proof the terms involving $c100$ which fall out of terms depending on $ep$ are not present,
-and choosing $c4 = 4, c8 = 8$ recovers the original argument to give $-c4 + 2 + 8 c4^2 slash c8^2 = -4 + 2 + 2 = 0$.
-
+// $ bb(E) [sum_(t in S_p) (delta_t inner(B u_t, v)) - 1/2 norm(P_p b_(p_t))^2 norm(P_p v)^2 | Delta_p] <= 1 $
+// applying the lemma about $B u_t$ and rewriting the projection in terms of the projection onto the appropriate gram schmidt vectors:
+// $ arrow.l.r.long bb(E) [sum_(t in S_p) (delta_t inner(sum_(s in S_p \ s <= t) sum_(r in Q_s) inner(w_(sigma(r)), b_(p_t)) w_(sigma(r)), v)) - 1/2 (sum_(s in S_p) sum_(r in Q_s) inner(w_(sigma(r)), b_(p_t))^2) (sum_(s in S_p) sum_(r in Q_s) inner(w_(sigma(r)), v)^2) | Delta_(S_p) ] <= 1 $
+// $ arrow.l.r.long bb(E) [sum_(t in S_p) delta_t (sum_(s in S_p \ s <= t) sum_(r in Q_s) inner(w_(sigma(r)), b_(p_t))  inner(w_(sigma(r)), v)) - 1/2 (sum_(s in S_p) sum_(r in Q_s) inner(w_(sigma(r)), b_(p_t))^2) (sum_(s in S_p) sum_(r in Q_s) inner(w_(sigma(r)), v)^2) | Delta_(S_p) ] <= 1 $
+// Define $alpha_r := inner(w_(sigma(r)), b_(p_t))$ and $beta_r := inner(w_(sigma(r)), b_(p_t))$
+// $ arrow.l.r.long bb(E) [sum_(t in S_p) delta_t (sum_(s in S_p \ s <= t) sum_(r in Q_s) alpha_r beta_r) - 1/2 (sum_(s in S_p) sum_(r in Q_s) alpha_r^2) (sum_(s in S_p) sum_(r in Q_s) beta_r^2) | Delta_(S_p) ] <= 1 $

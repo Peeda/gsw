@@ -15,7 +15,23 @@ python run_experiments.py                  # full grid -> results/ (resumable; r
 python run_experiments.py --report-only    # rebuild table and figures from results/raw/
 ```
 
-The grid reported below was run as:
+A Python older than 3.10 will not work, because the code uses `X | None` type
+hints and numpy ≥ 2. On a machine whose system Python is older (e.g. Ubuntu 20.04),
+use `uv venv --python 3.12 .venv` and then `uv pip install numpy scipy matplotlib pytest`.
+
+Two grids have been run. The results below come from the first; the second is
+reported as a replication.
+
+**Main grid** (`results_epyc/`: AMD EPYC 4564P, 16 cores/32 threads, 32 workers,
+6.9 h wall-clock time, 211 CPU-h of walks):
+
+```sh
+python run_experiments.py --outdir results_epyc \
+  --R-rules "lstsq@500=20,lstsq@200=1000,gs@500=300,gs/float16@500=300" \
+  --diag-runs 20 --diag-runs-by-n 500:0 2>&1 | tee results_epyc.log
+```
+
+**Laptop grid** (`results/`: 6-core/12-thread laptop, 12 workers, about 13 h):
 
 ```sh
 python run_experiments.py \
@@ -30,8 +46,8 @@ To estimate the time left on a running grid, run the same command with `--status
 The default settings run the full grid: R = 2000 everywhere except `walk_lstsq` at
 n = 500 (R = 300), with 20 diagnostic runs per cell (5 at n = 500). Each worker is
 single-threaded and `--workers` defaults to every hardware thread. Write to a
-separate output directory: BLAS on another machine may build the test matrices
-slightly differently, so raw files from different machines should not be mixed.
+separate output directory, so each machine's raw files stay separate (see
+"Replication" below).
 
 ```sh
 cd more_experiments
@@ -43,7 +59,8 @@ python run_experiments.py --outdir results_threadripper 2>&1 | tee results_threa
 ```
 
 - **Expected time:** very roughly 9 hours on 64 cores and 18 hours on 32 cores.
-  About half the work is float16 `walk_lstsq` at n = 500.
+  About half the work is float16 `walk_lstsq` at n = 500, at about 5 minutes per
+  run on the EPYC.
 - **Smoke-test projection:** it times walks one at a time, so it is optimistic.
   `walk_gs_compress` at n = 500 is limited by memory bandwidth and slows down
   considerably when every core is busy.
@@ -58,11 +75,7 @@ python run_experiments.py --outdir results_threadripper 2>&1 | tee results_threa
 - `--diag-runs` sets how many runs get per-step logging.
 - `--ns`, `--families`, `--dtypes`, `--impls` and `--workers` restrict the grid.
 
-Each task writes one file to `results/raw/`. Tables and figures are always rebuilt from those files.
-
-Run a whole grid on one machine. Test matrices are built with LAPACK/BLAS, which
-may differ in the last bits across machines. Mixing raw files from two machines
-would mix paths from slightly different B.
+Each task writes one file to `<outdir>/raw/`. Tables and figures are always rebuilt from those files.
 
 ## Layout
 
@@ -74,7 +87,8 @@ would mix paths from slightly different B.
 | `gsw_stability/metrics.py` | ψ₂ estimators, bias, CCDF, path divergence |
 | `gsw_stability/diagnostics.py` | per-step comparison against a float64 solve |
 | `gsw_stability/runner.py` | grid, multiprocessing, raw-result cache, timing projection |
-| `gsw_stability/report.py`, `plots.py` | `results/table.{csv,md}`, `results/figures/` |
+| `gsw_stability/report.py`, `plots.py` | `<outdir>/table.{csv,md}`, `<outdir>/figures/` |
+| `stability_references.md` | the error bounds from the literature that apply to each implementation, with statements and derivations |
 
 ## Arithmetic
 
@@ -205,32 +219,29 @@ Unless stated otherwise, measurements use float64 on the original B and the fina
 
 ## Results
 
-Full numbers are in `results/table.md` / `results/table.csv`, and figures in `results/figures/`.
-The grid ran on a 6-core/12-thread laptop with 12 workers and took about 13 hours of
-wall-clock time.
+These are the numbers from the main (EPYC) grid. Full numbers are in
+`results_epyc/table.md` / `results_epyc/table.csv`, and figures in
+`results_epyc/figures/`.
 
 **Runs per configuration** (the table's `R` column):
 
 | | n=50 | n=200 | n=500 |
 |---|---|---|---|
-| `walk_lstsq` (incl. the float64 baseline) | 2000 | 200 | 10 |
-| `walk_gs_compress` float64/float32 | 2000 | 2000 | 300–1000, varies by configuration |
-| `walk_gs_compress` float16 | 2000 | 2000 | 100 |
-| `walk_harshaw_cholesky`, refactor off and k=10 | 2000 | 2000 | 500 |
+| `walk_lstsq` (incl. the float64 baseline) | 2000 | 1000 | 20 |
+| `walk_gs_compress` | 2000 | 2000 | 300 |
+| `walk_harshaw_cholesky`, refactor off and k=10 | 2000 | 2000 | 2000 |
 
-- **Per-step diagnostics:** 10 runs per cell at n ≤ 200 and none at n = 500, so the
+- **Per-step diagnostics:** 20 runs per cell at n ≤ 200 and none at n = 500, so the
   `max_err_*` and `max_drift` columns are empty at n = 500.
 - **Ratios at n = 500:** ψ₂ ratios and divergence use only runs shared with the
-  float64 `walk_lstsq` baseline, which at n = 500 is at most 10.
-- **Uneven `gs` counts:** the n = 500 `walk_gs_compress` counts vary because the grid
-  was restarted with a lower setting partway through.
+  float64 `walk_lstsq` baseline, which at n = 500 is at most 20.
 
 ### Sanity checks
 
 - Every successful run ended with z ∈ {±1}ⁿ in at most n steps, for all
   implementations. `walk_gs_compress` never needed an extra zero-length step.
 - Float64 `walk_lstsq` on Gaussian B gives ψ₂ (Orlicz, max over directions) of 0.98,
-  0.98 and 0.94 at n = 50, 200 and 500 (R = 2000, 200 and 10).
+  0.96 and 1.05 at n = 50, 200 and 500 (R = 2000, 1000 and 20).
 - In float64, `walk_harshaw_cholesky` (refactor off and k = 10) and
   `walk_gs_compress` follow the same path as `walk_lstsq` on all 36 Harshaw
   configurations (0 divergence).
@@ -240,12 +251,12 @@ wall-clock time.
 ### Failures (fraction of runs)
 
 - **`walk_lstsq`** fails only in float16 on near-collinear pairs, with a non-finite u:
-  - η = 1e-5: 99.5%, 90.5% and 10% at n = 50, 200 and 500;
+  - η = 1e-5: 99.5%, 91.2% and 15% at n = 50, 200 and 500;
   - η = 1e-7: 100%.
 
   It did not fail on the conditioned family at any κ ≤ 1e8, in any precision.
 - **`walk_gs_compress`** fails when forming the initial inverse (Cholesky breakdown):
-  - float32 at κ ≥ 1e6 and η ≤ 1e-3; also 9% at η = 0.1 for n = 500;
+  - float32 at κ ≥ 1e6 and η ≤ 1e-3; also 8.3% at η = 0.1 for n = 500;
   - float16 at κ ≥ 1e4 and at every η. At κ = 1e2 it fails 0.7%, 96% and 100% of
     runs at n = 50, 200 and 500.
 - **`walk_harshaw_cholesky` in float16** fails with rank-one downdate breakdown
@@ -253,59 +264,76 @@ wall-clock time.
   - averaged over the 12 designs: 14%, 50% and 75% of runs at n = 50, 200 and 500;
   - 100% of runs in 6 designs at n = 200 and in 8 designs at n = 500;
   - no failures in float32.
-- **Refactoring (k = 10) in float16** reduces this to at most 1.8% of runs (one design
-  at n = 500), and at most 0.1% elsewhere.
+- **Refactoring (k = 10) in float16** reduces this to at most 1.75% of runs
+  (correlated X, d = 5, φ = 0.01 at n = 500), and at most 0.05% elsewhere.
 
 ### Path divergence from float64 `walk_lstsq`
 
 | conditioned, fraction diverged | κ=1e2 | κ=1e4 | κ=1e6 | κ=1e8 |
 |---|---|---|---|---|
 | `walk_lstsq` float32, n=50 | 0.0005 | 0.0015 | 0.135 | 0.966 |
-| `walk_lstsq` float32, n=200 | 0.005 | 0.025 | 0.67 | 1 |
-| `walk_lstsq` float32, n=500 (R=10) | 0 | 0.2 | 1 | 1 |
+| `walk_lstsq` float32, n=200 | 0.003 | 0.042 | 0.68 | 1 |
+| `walk_lstsq` float32, n=500 (R=20) | 0.05 | 0.15 | 1 | 1 |
 | `walk_lstsq` float16, all n | 0.97–1 | 1 | 1 | 1 |
-| `walk_gs_compress` **float64**, n=50/200/500 | 0 | 0 | 0 / 0.02 / 0.3 | 0.99–1 |
+| `walk_gs_compress` **float64**, n=50/200/500 | 0 | 0 | 0.0025 / 0.019 / 0.15 | 0.99–1 |
 
 - **Float64 `walk_gs_compress` on near-collinear pairs** also diverges from float64
   `walk_lstsq`:
-  - η = 1e-3: 0.05%, 12% and 60% of runs at n = 50, 200 and 500;
+  - η = 1e-3: 0.05%, 12% and 45% of runs at n = 50, 200 and 500;
   - η = 1e-5: 100%.
-- **Harshaw designs:** the mean fraction diverged is at most 4% in float32 for every
-  implementation, and 32–76% in float16.
+- **Harshaw designs:** in float32, the mean fraction diverged (over the 12 designs)
+  is at most 6% for every implementation and n. The largest single values are 25%
+  (`walk_harshaw_cholesky`) and 35% (k = 10) at n = 500. In float16 the mean is
+  32–75%.
 
 ### ψ₂ and bias
 
 **ψ₂ ratio** to float64 `walk_lstsq`, computed over the runs where both succeeded:
 - **Conditioned family, `walk_lstsq`:**
-  - float32: 0.90–1.12;
-  - float16: 0.81–1.39 up to n = 200, and 1.32 and 1.72 at κ = 1e6 and 1e8 for
-    n = 500 (R = 10).
-- **Harshaw designs, float32:** 1.00–1.04 for every implementation.
+  - float32: 0.97–1.02 up to n = 200. At n = 500 (R = 20) it is 1.06 at κ = 1e6
+    and 1.44 at κ = 1e8;
+  - float16: 0.99–1.17 up to n = 200. At n = 500 it ranges from 0.75 to 1.29.
+- **Harshaw designs, float32:** 1.00–1.01 up to n = 200 for every implementation.
+  At n = 500 the maximum is 1.03 for `walk_harshaw_cholesky` and 1.11 with k = 10.
 - **Harshaw designs, float16:**
-  - `walk_lstsq`: max 1.14 at n = 200 and 1.49 at n = 500;
-  - `walk_gs_compress`: max 1.86 at n = 200 and 6.74 at n = 500;
+  - `walk_lstsq`: max 1.04 at n = 200 and 1.53 at n = 500;
+  - `walk_gs_compress`: max 1.83 at n = 200 and 6.56 at n = 500;
   - `walk_harshaw_cholesky`: max 2.12, at n = 50, computed on the 2.6% of runs that
     did not fail;
-  - with refactoring (k = 10): median 1.12 at n = 200 and 1.43 at n = 500. The
-    maximum is 10.7 at n = 200 and 30.4 at n = 500, both on correlated X with d = 5
+  - with refactoring (k = 10): median 1.12 at n = 200 and 1.36 at n = 500. The
+    maximum is 10.5 at n = 200 and 36 at n = 500, both on correlated X with d = 5
     and φ = 0.01.
 
-**Near-collinear pairs, η = 1e-3.** The float64 ψ₂ is set by 9 of the 2000 runs at
-n = 50. In those runs, 1–5 of the 25 pairs end with equal signs, giving
-max |Y| ≈ 1.1. Without them, ψ₂ ≈ 1.1e-3 in every precision. Float32 has 8 such runs
-and float16 has none, so the float16 ψ₂ ratio is 0.003–0.006.
+**Near-collinear pairs, where a few runs set ψ₂.** At η ≤ 1e-3, ψ₂ is about 1e-3
+(η = 1e-3) or 1e-5 (η = 1e-5) in runs where every pair ends with opposite signs. A
+run with one or more equal-sign pairs has |Y| up to about 1, and a handful of such
+runs set ψ₂ for the whole cell:
+
+| η = 1e-3, `walk_lstsq` | float64 | float32 | float16 |
+|---|---|---|---|
+| n=50 (R=2000): runs with an equal-sign pair | 9 | 8 | 0 |
+| n=50: ψ₂ | 0.40 | 0.40 | 0.0013 |
+| n=200 (R=1000): runs with an equal-sign pair | 15 | 16 | 2 |
+| n=200: ψ₂ | 0.29 | 0.26 | 0.13 |
+
+- Without those runs, ψ₂ is 1.1e-3 to 1.3e-3 in every precision.
+- In the n = 50 runs affected, 1–7 of the 25 pairs have equal signs, and
+  max |Y| ≈ 1.1.
+- The float16 ψ₂ ratio at η = 1e-3 is therefore 0.003 at n = 50.
+- **η = 1e-5, float32, n = 200:** ψ₂ ratio 9,980. One of the 1000 float32 runs ended
+  with 3 equal-sign pairs (|Y| = 0.33). Neither the float64 nor the float16 runs
+  had any; without that run the float32 ψ₂ is 1.1e-5, matching float64 (1.3e-5).
 
 **Bias.** max_v |mean Y_v| / SE over the 22 directions:
 
-| rows | median | 95th percentile |
-|---|---|---|
-| float64 | 1.98 | 2.92 |
-| float32 | 2.02 | 2.98 |
-| float16 | 1.93 | 3.13 |
+| rows | median | 95th percentile | max |
+|---|---|---|---|
+| float64 | 1.98 | 2.85 | 3.01 |
+| float32 | 2.00 | 2.91 | 3.93 |
+| float16 | 1.89 | 2.85 | 3.52 |
 
-The largest value, 5.83, is float16 `walk_lstsq` on the Harshaw design
-corr = 0, d = 5, φ = 0.5 at n = 500 (R = 10). The same configuration in float64
-gives 4.44.
+The largest value, 3.93, is float32 `walk_gs_compress` on Gaussian B at n = 500
+(R = 300). The same configuration gives 3.01 in float64 and 1.86 in float16.
 
 ### Step-direction error (per-step diagnostics, n ≤ 200)
 
@@ -313,67 +341,118 @@ gives 4.44.
 
 | | κ ~ 1 | 1e2 | 1e4 | 1e6 |
 |---|---|---|---|---|
-| float32 ‖BΔu‖₂ | 1e-7 | 3e-7 | 4e-7 | 6e-7 |
-| float32 ‖Δu‖∞ | 8e-8 | 3e-6 | 2e-4 | 2e-2 |
-| float16 ‖BΔu‖₂ | 1e-3 | 2e-3 | 2e-3 | 7e-3 |
-| float16 ‖Δu‖∞ | 6e-4 | 2e-2 | 7e-1 | 3 |
+| float32 ‖BΔu‖₂ | 1.3e-7 | 2.8e-7 | 3.9e-7 | 5.8e-7 |
+| float32 ‖Δu‖∞ | 7.9e-8 | 2.6e-6 | 1.9e-4 | 1.9e-2 |
+| float16 ‖BΔu‖₂ | 1.1e-3 | 2.2e-3 | 2.2e-3 | 6.3e-3 |
+| float16 ‖Δu‖∞ | 6.5e-4 | 2.1e-2 | 0.66 | 2.9 |
 
 **Fitted slopes** of the median log error against log κ, all families pooled:
 
 | | ‖BΔu‖₂ float32 | ‖BΔu‖₂ float16 | ‖Δu‖∞ float32 | ‖Δu‖∞ float16 |
 |---|---|---|---|---|
-| `walk_lstsq` | 0.08 | 0.14 | 0.91 | 0.68 |
-| `walk_gs_compress` | 1.87 | 1.24 | 2.09 | 1.95 |
+| `walk_lstsq` | 0.08 | 0.17 | 0.91 | 0.66 |
+| `walk_gs_compress` | 1.86 | 1.22 | 2.09 | 1.88 |
 
-- **`walk_harshaw_cholesky`:** κ(B_{A∖p}) stays below 100 on the Harshaw designs, too
-  narrow a range for a slope.
+- **Harshaw designs:** κ(B_{A∖p}) stays below 50, too narrow a range for a slope.
+  Median errors, by decade of κ:
+
+  | | κ ~ 1 | κ ~ 10 |
+  |---|---|---|
+  | `walk_harshaw_cholesky` float32 ‖BΔu‖₂ | 5.7e-7 | 1.5e-5 |
+  | `walk_gs_compress` float32 ‖BΔu‖₂ | 1.4e-7 | 2.9e-6 |
+  | `walk_harshaw_cholesky` float16 ‖BΔu‖₂ | 1.1e-2 | 0.17 |
+  | `walk_gs_compress` float16 ‖BΔu‖₂ | 1.3e-3 | 2.3e-2 |
+
 - **Near-collinear pairs, `walk_lstsq` float32:** ‖BΔu‖₂ rises from 4e-8 at κ ~ 1 to
-  4e-3 at κ ~ 1e5, then returns to about 1e-6 for κ ≥ 1e6.
-- **Excluded points:** 13 float16 steps on near-collinear pairs have
+  5e-3 at κ ~ 1e5. It is between 2e-7 and 1.2e-6 for κ ≥ 1e6.
+- **Excluded points:** 33 float16 `walk_lstsq` steps on near-collinear pairs have
   κ(B_{A∖p}) > 1e17, because B_{A∖p} is singular after rounding to float16. They are
   left out of `figures/step_error_vs_kappa.png`.
 
 ### Factor drift (Harshaw designs, `figures/factor_drift_phi*.png`)
 
 - **`walk_harshaw_cholesky`:** ‖UᵀU − M‖_F / ‖M‖_F grows along the walk.
-  - At n = 200 and φ = 0.01 it goes from about 5e-7 to 1e-3 in float32, and from about
-    4e-3 to 0.1–0.3 in float16.
+  - At n = 200 and φ = 0.01 the median goes from 5e-7 at the first step to 4e-4 at
+    the last step in float32 (range 2e-4 to 1.5e-3 over runs). In float16 it goes
+    from 4e-3 to 0.12 (range 0.03 to 0.31).
   - Float16 lines stop where runs fail.
   - The float16 maximum over all designs is 0.62 at n = 200 and 0.81 at n = 50.
-- **With refactoring (k = 10):** a sawtooth with period 10, about 1e-7 to 5e-7 in
-  float32 and 3e-4 to 5e-3 in float16. It rises to 0.08–0.14 (float16) in the last
-  steps.
-- **`walk_gs_compress`:** ‖CQ − I‖_F / √k starts near 1e-4 in float32 and near 1 in
-  float16, then decreases as k shrinks. The float16 maximum is 1.47.
+- **With refactoring (k = 10):** a sawtooth with period 10. Away from the last 10
+  steps the 10th–90th percentile range is 7e-8 to 2.4e-7 in float32 and 6e-4 to
+  3e-3 in float16. In the last 10 steps it rises to at most 1.4e-5 (float32) and
+  0.09–0.14 (float16).
+- **`walk_gs_compress`:** ‖CQ − I‖_F / √k starts at a median of 8e-5 (float32) and
+  0.8 (float16) at n = 200, φ = 0.01, then decreases as k shrinks. The float16
+  maximum is 1.47.
 
 ### Snapping
 
 - **float64:** no tolerance snaps or clamps; forced-snap distance ≤ 4.4e-16.
 - **float32:**
-  - tolerance snaps: up to 223 per run (`walk_lstsq`, near-collinear, n = 500), and
-    at most 0.07 per run for the other implementations;
-  - clamps: at most 0.2 per run;
+  - tolerance snaps: up to 222 per run (`walk_lstsq`, near-collinear η = 1e-7,
+    n = 500), and at most 0.06 per run for the other implementations;
+  - clamps: at most 0.1 per run;
   - forced-snap distance ≤ 2.4e-7.
 - **float16:**
-  - tolerance snaps: up to 236 per run (`walk_lstsq`, near-collinear, n = 500) and
-    about 95 per run (`walk_lstsq`, conditioned, n = 500);
-  - clamps: at most 1.2 per run (`walk_gs_compress`);
+  - tolerance snaps: up to 238 per run (`walk_lstsq`, near-collinear η = 1e-3,
+    n = 500). The other implementations reach 61–73 per run
+    (`walk_harshaw_cholesky`, correlated X, d = 5, φ = 0.01, n = 500) and 66 per run
+    (`walk_gs_compress`, Gaussian, n = 500);
+  - clamps: at most 1.15 per run (`walk_gs_compress`);
   - forced-snap distance ≤ 2.0e-3.
+
+### Timing under full load (32 workers)
+
+Median seconds per run over configurations:
+
+| | n=50 | n=200 | n=500 |
+|---|---|---|---|
+| `walk_lstsq` float64 / float32 / float16 | 0.11 / 0.11 / 0.13 | 2.9 / 2.6 / 9.5 | 138 / 44 / 314 |
+| `walk_harshaw_cholesky` float64 / float32 / float16 | 0.036 / 0.036 / 0.043 | 0.14 / 0.15 / 0.14 | 0.37 / 0.38 / 0.39 |
+| `walk_gs_compress` float64 / float32 / float16 | 0.009 / 0.009 / 0.014 | 0.083 / 0.069 / 0.43 | 6.1 / 1.8 / 7.5 |
+
+### Replication on the laptop grid (`results/`)
+
+The laptop grid used the same seed with smaller R (see "Running"). For each cell
+and run index present in both grids, the final z and failure status were compared:
+- **99.4% of the 749,260 shared runs are identical.**
+- **Every difference is in float64 `walk_gs_compress` on the conditioned family:**
+  - κ = 1e8: 97–100% of runs differ;
+  - κ = 1e6: 0.2%, 1.0% and 3.0% at n = 50, 200 and 500;
+  - κ ≤ 1e4: none.
+
+  These are the same cells where float64 `walk_gs_compress` diverges from float64
+  `walk_lstsq` (table above).
+- **Summary numbers from the two grids.** The largest differences are in maxima
+  over the 12 Harshaw designs:
+  - the float16 k = 10 ψ₂ ratio maximum at n = 500 is 30.4 on the laptop
+    (R = 500) against 36 here (R = 2000);
+  - the largest mean float32 fraction diverged is 4% on the laptop (R = 10 for
+    the n = 500 baseline) against 6% here (R = 20).
 
 ### Surprises
 
 - **Low precision removed the ψ₂ outliers on near-collinear pairs (η = 1e-3).**
-  Float16 `walk_lstsq` produced none of the equal-sign-pair runs that set the float64
-  ψ₂. Its ψ₂ ratio is therefore about 0.005, not near or above 1.
+  Float16 `walk_lstsq` produced no equal-sign-pair runs at n = 50 and 2 at n = 200,
+  against 9 and 15 in float64. Its ψ₂ ratio at n = 50 is therefore about 0.003,
+  not near or above 1.
+- **A single float32 run gives a ψ₂ ratio of 9,980 at η = 1e-5, n = 200.**
 - **Float64 implementations diverge on ill-conditioned inputs.** `walk_gs_compress`
   and `walk_lstsq` take different paths in float64 at κ ≥ 1e6 and η ≤ 1e-3, while
-  agreeing on every Harshaw design.
+  agreeing on every Harshaw design. On those same cells float64 `walk_gs_compress`
+  also gives different z on the two machines.
 - **`walk_lstsq` never failed on the conditioned family,** including float16 at
   κ = 1e8. On that family its discrepancy-space step error is nearly independent of
   κ (slope ≈ 0.1), while its coefficient error grows about linearly in κ.
 - **Refactoring removed the float16 downdate failures but not the ψ₂ inflation.**
   With k = 10, `walk_harshaw_cholesky` has almost no float16 failures, and its runs
-  have the largest float16 ψ₂ ratios in the grid (up to 10.7 with R = 2000).
-- **`walk_gs_compress` slowed sharply under load at n = 500.** In float64 it ran at
-  9.6 s per run with 12 workers busy, against 0.41 s alone; in float32, 2.2 s against
-  0.25 s. The other implementations slowed by about 2× under the same load.
+  have the largest float16 ψ₂ ratios among the Harshaw designs (up to 10.5 at n = 200
+  and 36 at n = 500, with R = 2000).
+- **`walk_harshaw_cholesky` has 4–9× larger median ‖BΔu‖₂ than
+  `walk_gs_compress` on the Harshaw designs** at the same κ(B_{A∖p}), in both
+  float32 and float16.
+- **`walk_gs_compress` slows sharply under load at n = 500.** On the laptop it
+  ran at 9.6 s per run in float64 with 12 workers busy, against 0.41 s alone; in
+  float32, 2.2 s against 0.25 s. On the EPYC with 32 workers it ran at 6.1 s and
+  1.8 s. The other implementations slowed by about 2× on the laptop under the same
+  load.

@@ -54,7 +54,7 @@ def _subgaussian_sigma(vals: np.ndarray) -> tuple[float, float]:
 def n_sweep(
     m: int,
     n_values,
-    num_samples: int = 250,
+    num_samples: int = 10000,
     *,
     sig_bits: int | None = None,
     noise_mean: float = 0.0,
@@ -89,8 +89,11 @@ def n_sweep(
     savepath = f"results/n_sweep_{tag}.png"
 
     mean_discrepancies = []
+    mean_discrepancy_errs = []
     sigma_moms  = []
+    sigma_mom_errs  = []
     sigma_tails = []
+    sigma_tail_errs = []
 
     for n in tqdm(n_values, desc=f"n  [{tag}]"):
         u = np.random.randn(m); u /= np.linalg.norm(u)
@@ -104,28 +107,33 @@ def n_sweep(
             sig_bits=sig_bits, noise_mean=noise_mean, noise_std=noise_std,
             workers=workers,
         )
-        mean_discrepancies.append(bz_means.mean())
+        abs_bz = np.abs(bz_means)
+        mean_discrepancies.append(abs_bz.mean())
+        mean_discrepancy_errs.append(abs_bz.std())
 
-        sigma_mom_max = sigma_tail_max = 0.0
+        mom_list = []
+        tail_list = []
         for proj in projections:
             sm, st = _subgaussian_sigma(proj)
-            sigma_mom_max  = max(sigma_mom_max,  sm)
-            sigma_tail_max = max(sigma_tail_max, st)
-        sigma_moms.append(sigma_mom_max)
-        sigma_tails.append(sigma_tail_max)
+            mom_list.append(sm)
+            tail_list.append(st)
+        sigma_moms.append(max(mom_list))
+        sigma_mom_errs.append(np.std(mom_list))
+        sigma_tails.append(max(tail_list))
+        sigma_tail_errs.append(np.std(tail_list))
 
     n_list = list(n_values)
     fig, (ax_disc, ax_sg) = plt.subplots(1, 2, figsize=(10, 4))
     fig.suptitle(title)
 
-    ax_disc.plot(n_list, mean_discrepancies, marker="o", markersize=3)
+    ax_disc.errorbar(n_list, mean_discrepancies, yerr=mean_discrepancy_errs, marker="o", markersize=3)
     ax_disc.set_xlabel("n (number of columns)")
-    ax_disc.set_ylabel("mean of Bz")
+    ax_disc.set_ylabel("mean of |Bz|")
     ax_disc.axhline(0.0, color="gray", linestyle="--", linewidth=0.8, label="ideal (0)")
     ax_disc.legend()
 
-    ax_sg.plot(n_list, sigma_moms,  marker="o", markersize=3, label="moments")
-    ax_sg.plot(n_list, sigma_tails, marker="s", markersize=3, label="tails")
+    ax_sg.errorbar(n_list, sigma_moms,  yerr=sigma_mom_errs,  marker="o", markersize=3, label="moments")
+    ax_sg.errorbar(n_list, sigma_tails, yerr=sigma_tail_errs, marker="s", markersize=3, label="tails")
     ax_sg.axhline(1.0, color="gray", linestyle="--", linewidth=0.8, label="ideal (1)")
     ax_sg.set_xlabel("n (number of columns)")
     ax_sg.set_ylabel("estimated σ (subgaussian parameter)")
@@ -139,7 +147,7 @@ def n_sweep(
 
 def mn_sweep(
     N_values,
-    num_samples: int = 250,
+    num_samples: int = 10000,
     *,
     sig_bits: int | None = None,
     noise_mean: float = 0.0,
@@ -189,7 +197,7 @@ def mn_sweep(
             sig_bits=sig_bits, noise_mean=noise_mean, noise_std=noise_std,
             workers=workers,
         )
-        mean_discrepancies.append(bz_means.mean())
+        mean_discrepancies.append(np.abs(bz_means).mean())
 
         sigma_mom_max = sigma_tail_max = 0.0
         for proj in projections:
@@ -205,7 +213,7 @@ def mn_sweep(
 
     ax_disc.plot(N_list, mean_discrepancies, marker="o", markersize=3)
     ax_disc.set_xlabel("N (m = n)")
-    ax_disc.set_ylabel("mean of Bz")
+    ax_disc.set_ylabel("mean of |Bz|")
     ax_disc.axhline(0.0, color="gray", linestyle="--", linewidth=0.8, label="ideal (0)")
     ax_disc.legend()
 
@@ -223,7 +231,7 @@ def mn_sweep(
 
 
 if __name__ == "__main__":
-    m, n_values, num_samples = 30, range(250, 2001, 250), 200
+    m, n_values, num_samples = 30, range(250, 2001, 250), 10000
     n_sweep(m, n_values, num_samples, noise_mean=-2**(-16), noise_std=0.0)
     # n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-10))
     # n_sweep(m, n_values, 200, sig_bits=3)

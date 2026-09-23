@@ -34,6 +34,9 @@ def gram_schmidt_walk(
            Example: lambda n: np.random.normal(0, 0.01, n)
     Returns: WalkResult with assignment vector in {-1, +1}^n and run statistics
     """
+    r = chop if chop is not None else lambda x: x
+    B0 = np.asarray(B, dtype=float)
+    B = r(B0.copy())
     _, n = B.shape
     z = np.zeros(n)
     p = np.random.randint(n)
@@ -61,35 +64,45 @@ def gram_schmidt_walk(
             else:
                 v, _, _, _ = np.linalg.lstsq(B[:, free], -B[:, p], rcond=None)
             u[free] = v
+        u = r(u)
 
         # Feasible step interval Delta = {delta : z + delta*u in [-1,1]^n}
         nz = np.abs(u) > 1e-15
-        r1 = (-1 - z[nz]) / u[nz]
-        r2 = ( 1 - z[nz]) / u[nz]
-        delta_min = np.max(np.minimum(r1, r2))
-        delta_max = np.min(np.maximum(r1, r2))
+        _z = z[nz]
+        _u = u[nz]
+        r1 = r((-1.0 - _z) / _u)
+        r2 = r(( 1.0 - _z) / _u)
+        lo = r(np.minimum(r1, r2))
+        hi = r(np.maximum(r1, r2))
+        delta_min = float(r(np.array(np.max(lo))))
+        delta_max = float(r(np.array(np.min(hi))))
 
-        d_plus  = abs(delta_max)   # |max Delta|
-        d_minus = abs(delta_min)   # |min Delta|
-        total = d_plus + d_minus
+        d_plus  = float(r(np.array(abs(delta_max))))   # |max Delta|
+        d_minus = float(r(np.array(abs(delta_min))))   # |min Delta|
+        total = float(r(np.array(d_plus + d_minus)))
         if total < 1e-15:
             break
 
+        prob = float(r(np.array(d_minus / total)))
         # Martingale-preserving random step: E[delta_t] = 0
-        delta_t = d_plus if np.random.random() < d_minus / total else -d_minus
+        delta_t = d_plus if np.random.random() < prob else -d_minus
+        delta_t = float(r(np.array(delta_t)))
         if record_trajectory:
             trajectory.append((z.copy(), u.copy(), delta_t))
 
-        z += delta_t * u
+        z = r(z + r(delta_t * u))
         if noise is not None:
             unfrozen = np.abs(z) < 1 - 1e-9
-            z[unfrozen] += noise(unfrozen.sum())
+            _noise = r(noise(unfrozen.sum()))
+            z[unfrozen] = r(z[unfrozen] + _noise)
             z = np.clip(z, -1.0, 1.0)
-        z = np.where(np.abs(z) > 1 - 1e-9, np.sign(z), z)
+            z = r(z)
+        z = r(np.where(np.abs(z) > 1 - 1e-9, np.sign(z), z))
 
     assignment = np.sign(z).astype(int)
+    # final Bz is measured in full float64, independent of the rounded walk state
     return WalkResult(
         assignment=assignment,
-        Bz=B @ assignment,
+        Bz=B0 @ assignment,
         trajectory=trajectory if record_trajectory else [],
     )

@@ -36,7 +36,8 @@ def _rollout(seed_seq):
     # Independent global RNG state per task; SeedSequence keeps the streams decorrelated.
     np.random.seed(seed_seq.generate_state(8))
     r = gsw.gram_schmidt_walk(_B, chop=_CHOP, noise=_NOISE)
-    return r.Bz.mean(), _DIRS @ r.Bz
+    # final Bz is full float64; discrepancy is mean of |Bz|, subgaussianity uses signed projections
+    return np.abs(r.Bz).mean(), _DIRS @ r.Bz
 
 
 def default_workers():

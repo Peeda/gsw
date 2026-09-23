@@ -51,7 +51,7 @@ def _subgaussian_sigma(vals: np.ndarray) -> tuple[float, float]:
     return sigma_mom, sigma_tail
 
 
-def precision_sweep(m: int, n: int, num_samples: int = 1000, *, workers: int | None = None) -> None:
+def precision_sweep(m: int, n: int, num_samples: int = 10000, *, workers: int | None = None) -> None:
     """Sweep mantissa bits 2–52; plot mean of Bz (dim 0) and subgaussianity.
 
     workers: number of processes for the Monte-Carlo rollouts (default ≈ physical cores;
@@ -70,8 +70,11 @@ def precision_sweep(m: int, n: int, num_samples: int = 1000, *, workers: int | N
 
     sig_range = range(2, 53, 10)
     mean_discrepancies = []
+    mean_discrepancy_errs = []
     sigma_moms  = []
+    sigma_mom_errs  = []
     sigma_tails = []
+    sigma_tail_errs = []
 
     directions = _test_directions(B)  # (D, m)
 
@@ -81,29 +84,34 @@ def precision_sweep(m: int, n: int, num_samples: int = 1000, *, workers: int | N
             sig_bits=None if sig_bits == 52 else sig_bits,
             noise_std=2**(-32), workers=workers,
         )
-        mean_discrepancies.append(bz_means.mean())
+        abs_bz = np.abs(bz_means)
+        mean_discrepancies.append(abs_bz.mean())
+        mean_discrepancy_errs.append(abs_bz.std())
 
         # Max subgaussian parameter over all test directions
-        sigma_mom_max = sigma_tail_max = 0.0
+        mom_list = []
+        tail_list = []
         for proj in projections:
             sm, st = _subgaussian_sigma(proj)
-            sigma_mom_max  = max(sigma_mom_max,  sm)
-            sigma_tail_max = max(sigma_tail_max, st)
-        sigma_moms.append(sigma_mom_max)
-        sigma_tails.append(sigma_tail_max)
+            mom_list.append(sm)
+            tail_list.append(st)
+        sigma_moms.append(max(mom_list))
+        sigma_mom_errs.append(np.std(mom_list))
+        sigma_tails.append(max(tail_list))
+        sigma_tail_errs.append(np.std(tail_list))
 
     sig_list = list(sig_range)
     fig, (ax_disc, ax_sg) = plt.subplots(1, 2, figsize=(10, 4))
     fig.suptitle(f"GSW precision sweep  —  B: ({m}×{n}), {num_samples} samples")
 
-    ax_disc.plot(sig_list, mean_discrepancies, marker="o", markersize=3)
+    ax_disc.errorbar(sig_list, mean_discrepancies, yerr=mean_discrepancy_errs, marker="o", markersize=3)
     ax_disc.set_xlabel("mantissa bits (sig_bits)")
-    ax_disc.set_ylabel("mean of Bz (dim 0)")
+    ax_disc.set_ylabel("mean of |Bz| (dim 0)")
     ax_disc.axhline(0.0, color="gray", linestyle="--", linewidth=0.8, label="ideal (0)")
     ax_disc.legend()
 
-    ax_sg.plot(sig_list, sigma_moms,  marker="o", markersize=3, label="moments")
-    ax_sg.plot(sig_list, sigma_tails, marker="s", markersize=3, label="tails")
+    ax_sg.errorbar(sig_list, sigma_moms,  yerr=sigma_mom_errs,  marker="o", markersize=3, label="moments")
+    ax_sg.errorbar(sig_list, sigma_tails, yerr=sigma_tail_errs, marker="s", markersize=3, label="tails")
     ax_sg.set_xlabel("mantissa bits (sig_bits)")
     ax_sg.set_ylabel("estimated σ  (subgaussian parameter)")
     ax_sg.legend()
@@ -115,4 +123,4 @@ def precision_sweep(m: int, n: int, num_samples: int = 1000, *, workers: int | N
 
 
 if __name__ == "__main__":
-    precision_sweep(m=500, n=100, num_samples=250)
+    precision_sweep(m=500, n=100, num_samples=10000)

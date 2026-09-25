@@ -1,4 +1,4 @@
-Gram–Schmidt walk under reduced-precision arithmetic
+### Gram–Schmidt walk under reduced-precision arithmetic
 
 Code for studying how low-precision (reduced-mantissa) arithmetic degrades the
 Gram–Schmidt walk (Bansal–Dadush–Garg–Lovett). Given `B ∈ R^{m×n}` with

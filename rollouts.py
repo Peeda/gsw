@@ -37,7 +37,7 @@ def _rollout(seed_seq):
     np.random.seed(seed_seq.generate_state(8))
     r = gsw.gram_schmidt_walk(_B, chop=_CHOP, noise=_NOISE)
     # final Bz is full float64; discrepancy is mean of |Bz|, subgaussianity uses signed projections
-    return np.abs(r.Bz).mean(), _DIRS @ r.Bz
+    return np.abs(r.Bz).mean(), _DIRS @ r.Bz, r.Bz
 
 
 def default_workers():
@@ -47,10 +47,11 @@ def default_workers():
 
 def run_samples(B, directions, num_samples, *, sig_bits=None,
                 noise_mean=0.0, noise_std=0.0, workers=None, seed=None):
-    """Run `num_samples` independent walks on B; return (bz_means, projections).
+    """Run `num_samples` independent walks on B; return (bz_means, projections, bz_samples).
 
-    bz_means:    shape (num_samples,)                 mean of Bz per rollout
+    bz_means:    shape (num_samples,)                 mean of |Bz| per rollout
     projections: shape (len(directions), num_samples) directions @ Bz per rollout
+    bz_samples:  shape (m, num_samples)               full Bz vector per rollout
 
     chop mode (sig_bits) and noise (noise_mean/noise_std) may be combined — mutual
     exclusion, if wanted, is the caller's policy. workers=1 runs inline (no pool).
@@ -69,6 +70,7 @@ def run_samples(B, directions, num_samples, *, sig_bits=None,
             chunk = max(1, num_samples // (workers * 4))
             results = list(ex.map(_rollout, seed_seqs, chunksize=chunk))
 
-    bz_means = np.array([m for m, _ in results])
-    projections = np.stack([p for _, p in results], axis=1)
-    return bz_means, projections
+    bz_means = np.array([m for m, _, _ in results])
+    projections = np.stack([p for _, p, _ in results], axis=1)
+    bz_samples = np.stack([b for _, _, b in results], axis=1)
+    return bz_means, projections, bz_samples

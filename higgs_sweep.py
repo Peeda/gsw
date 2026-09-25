@@ -24,7 +24,9 @@ import numpy as np
 from sklearn.datasets import fetch_openml
 from tqdm import tqdm
 
-from precision_sweep import _subgaussian_sigma, _test_directions
+from precision_sweep import (
+    _subgaussian_sigma, _test_directions, _plot_inf_norm_ccdf,
+)
 import rollouts
 
 
@@ -74,6 +76,14 @@ def higgs_sweep(
     print(f"B shape: {m} × {n_actual}")
 
     sig_range = range(sig_bits_min, sig_bits_max + 1, sig_bits_step)
+    sig_list = list(sig_range)
+    colors = plt.cm.viridis(np.linspace(0, 1, len(sig_list)))
+    fig, (ax_disc, ax_sg, ax_cc) = plt.subplots(1, 3, figsize=(15, 4))
+    fig.suptitle(
+        f"GSW precision sweep — Higgs data ({m}×{n_actual}), "
+        f"{num_samples} samples"
+    )
+
     mean_discrepancies = []
     mean_discrepancy_errs = []
     sigma_moms = []
@@ -83,14 +93,15 @@ def higgs_sweep(
 
     directions = _test_directions(B, num_random=num_random_dirs)
 
-    for sig_bits in tqdm(sig_range, desc="sig_bits"):
-        bz_means, projections = rollouts.run_samples(
+    for sig_bits, col in zip(sig_list, tqdm(colors, desc="sig_bits")):
+        bz_means, projections, bz_samples = rollouts.run_samples(
             B, directions, num_samples,
             sig_bits=None if sig_bits == 52 else sig_bits,
             noise_std=2**(-32),
             workers=workers,
             seed=seed,
         )
+        _plot_inf_norm_ccdf(ax_cc, bz_samples, f"{sig_bits}b", col)
         abs_bz = np.abs(bz_means)
         mean_discrepancies.append(abs_bz.mean())
         mean_discrepancy_errs.append(abs_bz.std())
@@ -107,13 +118,6 @@ def higgs_sweep(
         sigma_tails.append(max(tail_list))
         sigma_tail_errs.append(np.std(tail_list))
 
-    sig_list = list(sig_range)
-    fig, (ax_disc, ax_sg) = plt.subplots(1, 2, figsize=(10, 4))
-    fig.suptitle(
-        f"GSW precision sweep — Higgs data ({m}×{n_actual}), "
-        f"{num_samples} samples"
-    )
-
     ax_disc.errorbar(sig_list, mean_discrepancies, yerr=mean_discrepancy_errs, marker="o", markersize=3)
     ax_disc.set_xlabel("mantissa bits (sig_bits)")
     ax_disc.set_ylabel("mean of |Bz| (dim 0)")
@@ -125,6 +129,12 @@ def higgs_sweep(
     ax_sg.set_xlabel("mantissa bits (sig_bits)")
     ax_sg.set_ylabel("estimated σ  (subgaussian parameter)")
     ax_sg.legend()
+
+    ax_cc.set_yscale("log")
+    ax_cc.set_xlabel("t²")
+    ax_cc.set_ylabel("Pr[‖Bz‖∞ > t]")
+    ax_cc.set_title("‖Bz‖∞ CCDF (dashed: union bound)")
+    ax_cc.legend(title="mantissa bits")
 
     fig.tight_layout()
     fig.savefig(save_path, dpi=150)

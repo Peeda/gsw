@@ -1,0 +1,20 @@
+Loading Higgs from OpenML (data_id=23512), features [0, 1], n=500...
+B shape: 2 × 500
+sig_bits:   0%|          | 0/6 [00:00<?, ?it/s]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+sig_bits:  17%|█▋        | 1/6 [01:10<05:50, 70.12s/it]sig_bits:  33%|███▎      | 2/6 [02:48<05:46, 86.68s/it]sig_bits:  50%|█████     | 3/6 [05:02<05:25, 108.54s/it]sig_bits:  67%|██████▋   | 4/6 [06:40<03:28, 104.39s/it]sig_bits:  83%|████████▎ | 5/6 [07:51<01:32, 92.07s/it] sig_bits:  83%|████████▎ | 5/6 [08:04<01:36, 96.86s/it]
+saved higgs_sweep.png

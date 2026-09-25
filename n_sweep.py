@@ -11,6 +11,7 @@ import numpy as np
 from tqdm import tqdm
 
 import rollouts
+from precision_sweep import _plot_inf_norm_ccdf
 
 
 def _test_directions(B: np.ndarray, num_random: int = 20) -> np.ndarray:
@@ -88,6 +89,11 @@ def n_sweep(
     title    = f"GSW n sweep  —  m={m}, {desc}, {num_samples} samples"
     savepath = f"results/n_sweep_{tag}.png"
 
+    n_list = list(n_values)
+    colors = plt.cm.viridis(np.linspace(0, 1, len(n_list)))
+    fig, (ax_disc, ax_sg, ax_cc) = plt.subplots(1, 3, figsize=(15, 4))
+    fig.suptitle(title)
+
     mean_discrepancies = []
     mean_discrepancy_errs = []
     sigma_moms  = []
@@ -95,18 +101,19 @@ def n_sweep(
     sigma_tails = []
     sigma_tail_errs = []
 
-    for n in tqdm(n_values, desc=f"n  [{tag}]"):
+    for n, col in zip(n_list, tqdm(colors, desc=f"n  [{tag}]")):
         u = np.random.randn(m); u /= np.linalg.norm(u)
         epsilon = 1 / np.sqrt(m)
         B = u[:, None] + epsilon * np.random.randn(m, n)
         B /= np.linalg.norm(B, axis=0)
 
         directions = _test_directions(B)  # (D, m)
-        bz_means, projections = rollouts.run_samples(
+        bz_means, projections, bz_samples = rollouts.run_samples(
             B, directions, num_samples,
             sig_bits=sig_bits, noise_mean=noise_mean, noise_std=noise_std,
             workers=workers,
         )
+        _plot_inf_norm_ccdf(ax_cc, bz_samples, f"n={n}", col)
         abs_bz = np.abs(bz_means)
         mean_discrepancies.append(abs_bz.mean())
         mean_discrepancy_errs.append(abs_bz.std())
@@ -122,10 +129,6 @@ def n_sweep(
         sigma_tails.append(max(tail_list))
         sigma_tail_errs.append(np.std(tail_list))
 
-    n_list = list(n_values)
-    fig, (ax_disc, ax_sg) = plt.subplots(1, 2, figsize=(10, 4))
-    fig.suptitle(title)
-
     ax_disc.errorbar(n_list, mean_discrepancies, yerr=mean_discrepancy_errs, marker="o", markersize=3)
     ax_disc.set_xlabel("n (number of columns)")
     ax_disc.set_ylabel("mean of |Bz|")
@@ -138,6 +141,12 @@ def n_sweep(
     ax_sg.set_xlabel("n (number of columns)")
     ax_sg.set_ylabel("estimated σ (subgaussian parameter)")
     ax_sg.legend()
+
+    ax_cc.set_yscale("log")
+    ax_cc.set_xlabel("t²")
+    ax_cc.set_ylabel("Pr[‖Bz‖∞ > t]")
+    ax_cc.set_title("‖Bz‖∞ CCDF (dashed: union bound)")
+    ax_cc.legend()
 
     fig.tight_layout()
     fig.savefig(savepath, dpi=150)
@@ -181,22 +190,28 @@ def mn_sweep(
     title    = f"GSW m=n sweep  —  {desc}, {num_samples} samples"
     savepath = f"results/mn_sweep_{tag}.png"
 
+    N_list = list(N_values)
+    colors = plt.cm.viridis(np.linspace(0, 1, len(N_list)))
+    fig, (ax_disc, ax_sg, ax_cc) = plt.subplots(1, 3, figsize=(15, 4))
+    fig.suptitle(title)
+
     mean_discrepancies = []
     sigma_moms  = []
     sigma_tails = []
 
-    for N in tqdm(N_values, desc=f"N  [{tag}]"):
+    for N, col in zip(N_list, tqdm(colors, desc=f"N  [{tag}]")):
         u = np.random.randn(N); u /= np.linalg.norm(u)
         epsilon = 1 / np.sqrt(N)
         B = u[:, None] + epsilon * np.random.randn(N, N)
         B /= np.linalg.norm(B, axis=0)
 
         directions = _test_directions(B)  # (D, N)
-        bz_means, projections = rollouts.run_samples(
+        bz_means, projections, bz_samples = rollouts.run_samples(
             B, directions, num_samples,
             sig_bits=sig_bits, noise_mean=noise_mean, noise_std=noise_std,
             workers=workers,
         )
+        _plot_inf_norm_ccdf(ax_cc, bz_samples, f"N={N}", col)
         mean_discrepancies.append(np.abs(bz_means).mean())
 
         sigma_mom_max = sigma_tail_max = 0.0
@@ -206,10 +221,6 @@ def mn_sweep(
             sigma_tail_max = max(sigma_tail_max, st)
         sigma_moms.append(sigma_mom_max)
         sigma_tails.append(sigma_tail_max)
-
-    N_list = list(N_values)
-    fig, (ax_disc, ax_sg) = plt.subplots(1, 2, figsize=(10, 4))
-    fig.suptitle(title)
 
     ax_disc.plot(N_list, mean_discrepancies, marker="o", markersize=3)
     ax_disc.set_xlabel("N (m = n)")
@@ -224,6 +235,12 @@ def mn_sweep(
     ax_sg.set_ylabel("estimated σ (subgaussian parameter)")
     ax_sg.legend()
 
+    ax_cc.set_yscale("log")
+    ax_cc.set_xlabel("t²")
+    ax_cc.set_ylabel("Pr[‖Bz‖∞ > t]")
+    ax_cc.set_title("‖Bz‖∞ CCDF (dashed: union bound)")
+    ax_cc.legend()
+
     fig.tight_layout()
     fig.savefig(savepath, dpi=150)
     plt.close(fig)
@@ -232,7 +249,7 @@ def mn_sweep(
 
 if __name__ == "__main__":
     m, n_values, num_samples = 30, range(250, 2001, 250), 10000
-    n_sweep(m, n_values, num_samples, noise_mean=-2**(-16), noise_std=0.0)
+    n_sweep(m, n_values, num_samples)
     # n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-10))
     # n_sweep(m, n_values, 200, sig_bits=3)
     N_values = range(200, 1001, 200)

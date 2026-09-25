@@ -1,0 +1,97 @@
+Loading Higgs from OpenML (data_id=23512), features [0, 1], n=500...
+sig_bits:   0%|          | 0/22 [00:00<?, ?it/s]/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+sig_bits:   5%|▍         | 1/22 [00:39<13:45, 39.30s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+sig_bits:   9%|▉         | 2/22 [01:28<15:06, 45.34s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+sig_bits:  14%|█▎        | 3/22 [02:17<14:53, 47.03s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+sig_bits:  18%|█▊        | 4/22 [03:02<13:48, 46.04s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+sig_bits:  23%|██▎       | 5/22 [03:50<13:15, 46.78s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+sig_bits:  27%|██▋       | 6/22 [04:39<12:42, 47.68s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+sig_bits:  32%|███▏      | 7/22 [05:26<11:50, 47.35s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+sig_bits:  36%|███▋      | 8/22 [06:12<10:55, 46.80s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+sig_bits:  41%|████      | 9/22 [06:57<10:01, 46.28s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+sig_bits:  45%|████▌     | 10/22 [07:57<10:06, 50.54s/it]sig_bits:  50%|█████     | 11/22 [08:43<09:00, 49.16s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+sig_bits:  55%|█████▍    | 12/22 [09:33<08:13, 49.32s/it]sig_bits:  59%|█████▉    | 13/22 [10:20<07:18, 48.70s/it]sig_bits:  64%|██████▎   | 14/22 [11:03<06:16, 47.10s/it]sig_bits:  68%|██████▊   | 15/22 [11:52<05:32, 47.46s/it]sig_bits:  73%|███████▎  | 16/22 [12:35<04:36, 46.13s/it]sig_bits:  77%|███████▋  | 17/22 [13:31<04:05, 49.08s/it]sig_bits:  82%|████████▏ | 18/22 [14:19<03:14, 48.73s/it]sig_bits:  86%|████████▋ | 19/22 [15:09<02:27, 49.24s/it]sig_bits:  91%|█████████ | 20/22 [15:51<01:34, 47.17s/it]sig_bits:  95%|█████████▌| 21/22 [16:29<00:44, 44.23s/it]sig_bits: 100%|██████████| 22/22 [16:36<00:00, 33.21s/it]sig_bits: 100%|██████████| 22/22 [16:36<00:00, 45.30s/it]
+cached stats -> bits_subgauss_cache.npz
+fits: sig0=0.744  c(1+c·2^-b)=37.3  c(σ0+c·2^-b)=38.8  c(quadrature)=43.6
+saved bits_subgauss.png

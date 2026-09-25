@@ -23,7 +23,9 @@ import numpy as np
 from tqdm import tqdm
 
 import rollouts
-from precision_sweep import _subgaussian_sigma, _test_directions
+from precision_sweep import (
+    _subgaussian_sigma, _test_directions, _plot_inf_norm_ccdf,
+)
 
 
 def identity_sweep(
@@ -40,27 +42,33 @@ def identity_sweep(
     if sig_bits_values is None:
         sig_bits_values = [10, 13, 20, 30, 40, 52]
 
-    fig, (ax_n, ax_bits) = plt.subplots(1, 2, figsize=(11, 4))
-    fig.suptitle(r"B = I_n: tight Rademacher instance ($\sigma^2 = 1$)")
-
-    # left: sigma vs n for each sig_bits
-    colors = plt.cm.viridis(np.linspace(0, 1, len(sig_bits_values)))
-    for sig_bits, col in zip(sig_bits_values, colors):
-        sigmas = []
-        sigma_errs = []
-        for n in tqdm(n_values, desc=f"sig_bits={sig_bits}"):
+    # single pass over all (sig_bits, n) configs; reuse for every panel
+    mom_lists = {}
+    bz_samples = {}
+    for sig_bits in tqdm(sig_bits_values, desc="sig_bits"):
+        for n in n_values:
             B = np.eye(n)
             directions = _test_directions(B, num_random=num_random_dirs)
-            _, projections = rollouts.run_samples(
+            _, projections, bz = rollouts.run_samples(
                 B, directions, num_samples,
                 sig_bits=None if sig_bits == 52 else sig_bits,
                 noise_std=0.0,
                 workers=workers,
                 seed=0,
             )
-            mom_list = [_subgaussian_sigma(proj)[0] for proj in projections]
-            sigmas.append(max(mom_list))
-            sigma_errs.append(np.std(mom_list))
+            mom_lists[(sig_bits, n)] = [
+                _subgaussian_sigma(proj)[0] for proj in projections
+            ]
+            bz_samples[(sig_bits, n)] = bz
+
+    fig, (ax_n, ax_bits, ax_cc) = plt.subplots(1, 3, figsize=(16, 4))
+    fig.suptitle(r"B = I_n: tight Rademacher instance ($\sigma^2 = 1$)")
+
+    # left: sigma vs n for each sig_bits
+    colors = plt.cm.viridis(np.linspace(0, 1, len(sig_bits_values)))
+    for sig_bits, col in zip(sig_bits_values, colors):
+        sigmas = [max(mom_lists[(sig_bits, n)]) for n in n_values]
+        sigma_errs = [np.std(mom_lists[(sig_bits, n)]) for n in n_values]
         ax_n.errorbar(n_values, sigmas, yerr=sigma_errs, marker="o", markersize=4, color=col, label=f"{sig_bits}b")
 
     ax_n.set_xlabel("n")
@@ -70,24 +78,11 @@ def identity_sweep(
     ax_n.axhline(1.0, color="gray", linestyle="--", linewidth=0.8, label="σ=1")
     ax_n.legend(title="mantissa bits")
 
-    # right: sigma vs sig_bits for each n
+    # middle: sigma vs sig_bits for each n
     colors = plt.cm.plasma(np.linspace(0, 1, len(n_values)))
     for n, col in zip(n_values, colors):
-        B = np.eye(n)
-        directions = _test_directions(B, num_random=num_random_dirs)
-        sigmas = []
-        sigma_errs = []
-        for sig_bits in tqdm(sig_bits_values, desc=f"n={n}"):
-            _, projections = rollouts.run_samples(
-                B, directions, num_samples,
-                sig_bits=None if sig_bits == 52 else sig_bits,
-                noise_std=0.0,
-                workers=workers,
-                seed=0,
-            )
-            mom_list = [_subgaussian_sigma(proj)[0] for proj in projections]
-            sigmas.append(max(mom_list))
-            sigma_errs.append(np.std(mom_list))
+        sigmas = [max(mom_lists[(sig_bits, n)]) for sig_bits in sig_bits_values]
+        sigma_errs = [np.std(mom_lists[(sig_bits, n)]) for sig_bits in sig_bits_values]
         ax_bits.errorbar(sig_bits_values, sigmas, yerr=sigma_errs, marker="s", markersize=4, color=col, label=f"n={n}")
 
     ax_bits.set_xlabel("mantissa bits (sig_bits)")
@@ -95,6 +90,19 @@ def identity_sweep(
     ax_bits.set_title("σ vs precision")
     ax_bits.axhline(1.0, color="gray", linestyle="--", linewidth=0.8, label="σ=1")
     ax_bits.legend(title="n")
+
+    # right: ||Bz||_inf CCDF per n at highest (solid) and lowest (dotted) precision
+    hi_bits, lo_bits = max(sig_bits_values), min(sig_bits_values)
+    for n, col in zip(n_values, colors):
+        _plot_inf_norm_ccdf(ax_cc, bz_samples[(hi_bits, n)],
+                            f"n={n}, {hi_bits}b", col)
+        _plot_inf_norm_ccdf(ax_cc, bz_samples[(lo_bits, n)],
+                            f"n={n}, {lo_bits}b", col, linestyle=":")
+    ax_cc.set_yscale("log")
+    ax_cc.set_xlabel("t²")
+    ax_cc.set_ylabel("Pr[‖Bz‖∞ > t]")
+    ax_cc.set_title("‖Bz‖∞ CCDF (dashed: union bound)")
+    ax_cc.legend(fontsize=7)
 
     fig.tight_layout()
     fig.savefig(save_path, dpi=150)

@@ -51,6 +51,26 @@ def _subgaussian_sigma(vals: np.ndarray) -> tuple[float, float]:
     return sigma_mom, sigma_tail
 
 
+def _plot_inf_norm_ccdf(ax, bz_samples, label, color, linestyle="-"):
+    """CCDF of ||Bz||_inf on (t^2, log-survival) axes + union-bound reference.
+
+    Pr[||Bz||_inf > t] <= sum_i 2 exp(-t^2 / (2 sigma_i^2)) with sigma_i the
+    per-coordinate moment estimate. On these axes a Gaussian tail is a straight
+    line with slope -1/(2 sigma^2).
+
+    bz_samples: (m, num_samples) array of Bz vectors (bz_samples[i] = coord i).
+    """
+    t = np.sort(np.abs(bz_samples).max(axis=0))
+    surv = np.arange(len(t), 0, -1) / len(t)
+    ax.plot(t ** 2, surv, linestyle, color=color, label=label)
+    sig_i = np.maximum(
+        [_subgaussian_sigma(coord)[0] for coord in bz_samples], 1e-12
+    )
+    ub = (2.0 * np.exp(-(t ** 2) / (2.0 * sig_i[:, None] ** 2))).sum(axis=0)
+    ax.plot(t ** 2, np.clip(ub, None, 1.0), "--", color=color,
+            alpha=0.4, linewidth=1)
+
+
 def precision_sweep(m: int, n: int, num_samples: int = 10000, *, workers: int | None = None) -> None:
     """Sweep mantissa bits 2–52; plot mean of Bz (dim 0) and subgaussianity.
 
@@ -69,6 +89,11 @@ def precision_sweep(m: int, n: int, num_samples: int = 10000, *, workers: int | 
     # B = np.eye(m)
 
     sig_range = range(2, 53, 10)
+    sig_list = list(sig_range)
+    colors = plt.cm.viridis(np.linspace(0, 1, len(sig_list)))
+    fig, (ax_disc, ax_sg, ax_cc) = plt.subplots(1, 3, figsize=(15, 4))
+    fig.suptitle(f"GSW precision sweep  —  B: ({m}×{n}), {num_samples} samples")
+
     mean_discrepancies = []
     mean_discrepancy_errs = []
     sigma_moms  = []
@@ -78,12 +103,13 @@ def precision_sweep(m: int, n: int, num_samples: int = 10000, *, workers: int | 
 
     directions = _test_directions(B)  # (D, m)
 
-    for sig_bits in tqdm(sig_range, desc="sig_bits"):
-        bz_means, projections = rollouts.run_samples(
+    for sig_bits, col in zip(sig_list, tqdm(colors, desc="sig_bits")):
+        bz_means, projections, bz_samples = rollouts.run_samples(
             B, directions, num_samples,
             sig_bits=None if sig_bits == 52 else sig_bits,
             noise_std=2**(-32), workers=workers,
         )
+        _plot_inf_norm_ccdf(ax_cc, bz_samples, f"{sig_bits}b", col)
         abs_bz = np.abs(bz_means)
         mean_discrepancies.append(abs_bz.mean())
         mean_discrepancy_errs.append(abs_bz.std())
@@ -100,10 +126,6 @@ def precision_sweep(m: int, n: int, num_samples: int = 10000, *, workers: int | 
         sigma_tails.append(max(tail_list))
         sigma_tail_errs.append(np.std(tail_list))
 
-    sig_list = list(sig_range)
-    fig, (ax_disc, ax_sg) = plt.subplots(1, 2, figsize=(10, 4))
-    fig.suptitle(f"GSW precision sweep  —  B: ({m}×{n}), {num_samples} samples")
-
     ax_disc.errorbar(sig_list, mean_discrepancies, yerr=mean_discrepancy_errs, marker="o", markersize=3)
     ax_disc.set_xlabel("mantissa bits (sig_bits)")
     ax_disc.set_ylabel("mean of |Bz| (dim 0)")
@@ -115,6 +137,12 @@ def precision_sweep(m: int, n: int, num_samples: int = 10000, *, workers: int | 
     ax_sg.set_xlabel("mantissa bits (sig_bits)")
     ax_sg.set_ylabel("estimated σ  (subgaussian parameter)")
     ax_sg.legend()
+
+    ax_cc.set_yscale("log")
+    ax_cc.set_xlabel("t²")
+    ax_cc.set_ylabel("Pr[‖Bz‖∞ > t]")
+    ax_cc.set_title("‖Bz‖∞ CCDF (dashed: union bound)")
+    ax_cc.legend(title="mantissa bits")
 
     fig.tight_layout()
     fig.savefig("precision_sweep.png", dpi=150)

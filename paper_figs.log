@@ -1,0 +1,384 @@
+
+=== .venv/bin/python -u noise_vs_chop.py ===
+Loading Higgs from OpenML (data_id=23512), features [0, 1], n=1600...
+noise sig_bits:   0%|          | 0/6 [00:00<?, ?it/s]noise sig_bits:  17%|█▋        | 1/6 [00:12<01:03, 12.65s/it]noise sig_bits:  33%|███▎      | 2/6 [00:30<01:02, 15.62s/it]noise sig_bits:  50%|█████     | 3/6 [01:43<02:05, 41.68s/it]noise sig_bits:  67%|██████▋   | 4/6 [02:58<01:49, 54.90s/it]noise sig_bits:  83%|████████▎ | 5/6 [04:12<01:01, 61.99s/it]noise sig_bits: 100%|██████████| 6/6 [05:13<00:00, 61.68s/it]noise sig_bits: 100%|██████████| 6/6 [05:13<00:00, 52.31s/it]
+cached noise stats -> noise_vs_chop_cache.npz
+saved noise_vs_chop.png
+=== done in 317s ===
+
+=== .venv/bin/python -u shape_persist.py ===
+Loading Higgs from OpenML (data_id=23512), features [0, 1], n=1600...
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+done 2b
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+done 3b
+saved shape_persist.png
+=== done in 424s ===
+
+=== .venv/bin/python -u -c "import step_landing; [step_landing.step_landing(m=30, n=200, sig_bits=b, samples=150, seed=0) for b in (4, 8, 23)]" ===
+walks m=30 n=200 s=4:   0%|          | 0/150 [00:00<?, ?it/s]walks m=30 n=200 s=4:   1%|          | 1/150 [00:00<01:20,  1.85it/s]walks m=30 n=200 s=4:   1%|▏         | 2/150 [00:01<01:21,  1.83it/s]walks m=30 n=200 s=4:   2%|▏         | 3/150 [00:01<01:20,  1.83it/s]walks m=30 n=200 s=4:   3%|▎         | 4/150 [00:02<01:19,  1.85it/s]walks m=30 n=200 s=4:   3%|▎         | 5/150 [00:02<01:18,  1.85it/s]walks m=30 n=200 s=4:   4%|▍         | 6/150 [00:03<01:18,  1.84it/s]walks m=30 n=200 s=4:   5%|▍         | 7/150 [00:03<01:17,  1.85it/s]walks m=30 n=200 s=4:   5%|▌         | 8/150 [00:04<01:26,  1.64it/s]walks m=30 n=200 s=4:   6%|▌         | 9/150 [00:05<01:24,  1.67it/s]walks m=30 n=200 s=4:   7%|▋         | 10/150 [00:05<01:21,  1.72it/s]walks m=30 n=200 s=4:   7%|▋         | 11/150 [00:06<01:18,  1.76it/s]walks m=30 n=200 s=4:   8%|▊         | 12/150 [00:06<01:18,  1.77it/s]walks m=30 n=200 s=4:   9%|▊         | 13/150 [00:07<01:17,  1.77it/s]walks m=30 n=200 s=4:   9%|▉         | 14/150 [00:07<01:16,  1.79it/s]walks m=30 n=200 s=4:  10%|█         | 15/150 [00:08<01:15,  1.79it/s]walks m=30 n=200 s=4:  11%|█         | 16/150 [00:09<01:15,  1.78it/s]walks m=30 n=200 s=4:  11%|█▏        | 17/150 [00:09<01:14,  1.78it/s]walks m=30 n=200 s=4:  12%|█▏        | 18/150 [00:10<01:13,  1.79it/s]walks m=30 n=200 s=4:  13%|█▎        | 19/150 [00:11<01:32,  1.41it/s]walks m=30 n=200 s=4:  13%|█▎        | 20/150 [00:11<01:28,  1.46it/s]walks m=30 n=200 s=4:  14%|█▍        | 21/150 [00:12<01:23,  1.54it/s]walks m=30 n=200 s=4:  15%|█▍        | 22/150 [00:12<01:19,  1.61it/s]walks m=30 n=200 s=4:  15%|█▌        | 23/150 [00:13<01:16,  1.66it/s]walks m=30 n=200 s=4:  16%|█▌        | 24/150 [00:14<01:16,  1.64it/s]walks m=30 n=200 s=4:  17%|█▋        | 25/150 [00:14<01:13,  1.69it/s]walks m=30 n=200 s=4:  17%|█▋        | 26/150 [00:15<01:12,  1.72it/s]walks m=30 n=200 s=4:  18%|█▊        | 27/150 [00:15<01:10,  1.75it/s]walks m=30 n=200 s=4:  19%|█▊        | 28/150 [00:16<01:09,  1.75it/s]walks m=30 n=200 s=4:  19%|█▉        | 29/150 [00:17<01:12,  1.67it/s]walks m=30 n=200 s=4:  20%|██        | 30/150 [00:17<01:17,  1.55it/s]walks m=30 n=200 s=4:  21%|██        | 31/150 [00:18<01:13,  1.63it/s]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+walks m=30 n=200 s=4:  21%|██▏       | 32/150 [00:18<01:09,  1.69it/s]walks m=30 n=200 s=4:  22%|██▏       | 33/150 [00:19<01:06,  1.75it/s]walks m=30 n=200 s=4:  23%|██▎       | 34/150 [00:19<01:05,  1.77it/s]walks m=30 n=200 s=4:  23%|██▎       | 35/150 [00:20<01:05,  1.76it/s]walks m=30 n=200 s=4:  24%|██▍       | 36/150 [00:21<01:04,  1.77it/s]walks m=30 n=200 s=4:  25%|██▍       | 37/150 [00:21<01:04,  1.74it/s]walks m=30 n=200 s=4:  25%|██▌       | 38/150 [00:22<01:04,  1.73it/s]walks m=30 n=200 s=4:  26%|██▌       | 39/150 [00:22<01:05,  1.70it/s]walks m=30 n=200 s=4:  27%|██▋       | 40/150 [00:23<01:03,  1.73it/s]walks m=30 n=200 s=4:  27%|██▋       | 41/150 [00:23<01:01,  1.77it/s]walks m=30 n=200 s=4:  28%|██▊       | 42/150 [00:24<01:00,  1.80it/s]walks m=30 n=200 s=4:  29%|██▊       | 43/150 [00:25<01:01,  1.74it/s]walks m=30 n=200 s=4:  29%|██▉       | 44/150 [00:25<01:00,  1.76it/s]walks m=30 n=200 s=4:  30%|███       | 45/150 [00:26<00:59,  1.77it/s]walks m=30 n=200 s=4:  31%|███       | 46/150 [00:26<00:57,  1.79it/s]walks m=30 n=200 s=4:  31%|███▏      | 47/150 [00:27<00:56,  1.82it/s]walks m=30 n=200 s=4:  32%|███▏      | 48/150 [00:27<00:55,  1.84it/s]walks m=30 n=200 s=4:  33%|███▎      | 49/150 [00:28<00:55,  1.83it/s]walks m=30 n=200 s=4:  33%|███▎      | 50/150 [00:28<00:54,  1.83it/s]walks m=30 n=200 s=4:  34%|███▍      | 51/150 [00:29<00:54,  1.83it/s]walks m=30 n=200 s=4:  35%|███▍      | 52/150 [00:29<00:53,  1.84it/s]walks m=30 n=200 s=4:  35%|███▌      | 53/150 [00:30<00:57,  1.69it/s]walks m=30 n=200 s=4:  36%|███▌      | 54/150 [00:31<01:04,  1.49it/s]walks m=30 n=200 s=4:  37%|███▋      | 55/150 [00:32<01:00,  1.58it/s]walks m=30 n=200 s=4:  37%|███▋      | 56/150 [00:32<00:56,  1.66it/s]walks m=30 n=200 s=4:  38%|███▊      | 57/150 [00:33<00:54,  1.70it/s]walks m=30 n=200 s=4:  39%|███▊      | 58/150 [00:33<00:52,  1.74it/s]walks m=30 n=200 s=4:  39%|███▉      | 59/150 [00:34<00:55,  1.65it/s]walks m=30 n=200 s=4:  40%|████      | 60/150 [00:34<00:53,  1.67it/s]walks m=30 n=200 s=4:  41%|████      | 61/150 [00:35<00:51,  1.73it/s]walks m=30 n=200 s=4:  41%|████▏     | 62/150 [00:36<00:50,  1.75it/s]walks m=30 n=200 s=4:  42%|████▏     | 63/150 [00:36<00:49,  1.77it/s]walks m=30 n=200 s=4:  43%|████▎     | 64/150 [00:37<00:49,  1.75it/s]walks m=30 n=200 s=4:  43%|████▎     | 65/150 [00:37<00:47,  1.77it/s]walks m=30 n=200 s=4:  44%|████▍     | 66/150 [00:38<00:46,  1.79it/s]walks m=30 n=200 s=4:  45%|████▍     | 67/150 [00:38<00:45,  1.81it/s]walks m=30 n=200 s=4:  45%|████▌     | 68/150 [00:39<00:44,  1.83it/s]walks m=30 n=200 s=4:  46%|████▌     | 69/150 [00:39<00:44,  1.84it/s]walks m=30 n=200 s=4:  47%|████▋     | 70/150 [00:40<00:43,  1.85it/s]walks m=30 n=200 s=4:  47%|████▋     | 71/150 [00:40<00:42,  1.86it/s]walks m=30 n=200 s=4:  48%|████▊     | 72/150 [00:41<00:41,  1.86it/s]walks m=30 n=200 s=4:  49%|████▊     | 73/150 [00:42<00:41,  1.87it/s]walks m=30 n=200 s=4:  49%|████▉     | 74/150 [00:42<00:40,  1.86it/s]walks m=30 n=200 s=4:  50%|█████     | 75/150 [00:43<00:40,  1.85it/s]walks m=30 n=200 s=4:  51%|█████     | 76/150 [00:43<00:40,  1.83it/s]walks m=30 n=200 s=4:  51%|█████▏    | 77/150 [00:44<00:39,  1.83it/s]walks m=30 n=200 s=4:  52%|█████▏    | 78/150 [00:44<00:39,  1.84it/s]walks m=30 n=200 s=4:  53%|█████▎    | 79/150 [00:45<00:38,  1.83it/s]walks m=30 n=200 s=4:  53%|█████▎    | 80/150 [00:45<00:39,  1.76it/s]walks m=30 n=200 s=4:  54%|█████▍    | 81/150 [00:46<00:38,  1.79it/s]walks m=30 n=200 s=4:  55%|█████▍    | 82/150 [00:47<00:38,  1.78it/s]walks m=30 n=200 s=4:  55%|█████▌    | 83/150 [00:47<00:37,  1.79it/s]walks m=30 n=200 s=4:  56%|█████▌    | 84/150 [00:48<00:36,  1.80it/s]walks m=30 n=200 s=4:  57%|█████▋    | 85/150 [00:48<00:39,  1.66it/s]walks m=30 n=200 s=4:  57%|█████▋    | 86/150 [00:49<00:37,  1.72it/s]walks m=30 n=200 s=4:  58%|█████▊    | 87/150 [00:49<00:36,  1.75it/s]walks m=30 n=200 s=4:  59%|█████▊    | 88/150 [00:50<00:34,  1.78it/s]walks m=30 n=200 s=4:  59%|█████▉    | 89/150 [00:51<00:36,  1.67it/s]walks m=30 n=200 s=4:  60%|██████    | 90/150 [00:51<00:34,  1.73it/s]walks m=30 n=200 s=4:  61%|██████    | 91/150 [00:52<00:34,  1.69it/s]walks m=30 n=200 s=4:  61%|██████▏   | 92/150 [00:52<00:33,  1.71it/s]walks m=30 n=200 s=4:  62%|██████▏   | 93/150 [00:53<00:32,  1.76it/s]walks m=30 n=200 s=4:  63%|██████▎   | 94/150 [00:53<00:31,  1.79it/s]walks m=30 n=200 s=4:  63%|██████▎   | 95/150 [00:54<00:30,  1.81it/s]walks m=30 n=200 s=4:  64%|██████▍   | 96/150 [00:55<00:30,  1.76it/s]walks m=30 n=200 s=4:  65%|██████▍   | 97/150 [00:55<00:30,  1.76it/s]walks m=30 n=200 s=4:  65%|██████▌   | 98/150 [00:56<00:29,  1.75it/s]walks m=30 n=200 s=4:  66%|██████▌   | 99/150 [00:56<00:28,  1.77it/s]walks m=30 n=200 s=4:  67%|██████▋   | 100/150 [00:57<00:27,  1.79it/s]walks m=30 n=200 s=4:  67%|██████▋   | 101/150 [00:57<00:26,  1.82it/s]walks m=30 n=200 s=4:  68%|██████▊   | 102/150 [00:58<00:26,  1.82it/s]walks m=30 n=200 s=4:  69%|██████▊   | 103/150 [00:58<00:25,  1.82it/s]walks m=30 n=200 s=4:  69%|██████▉   | 104/150 [00:59<00:25,  1.84it/s]walks m=30 n=200 s=4:  70%|███████   | 105/150 [01:00<00:24,  1.85it/s]walks m=30 n=200 s=4:  71%|███████   | 106/150 [01:00<00:23,  1.86it/s]walks m=30 n=200 s=4:  71%|███████▏  | 107/150 [01:01<00:23,  1.85it/s]walks m=30 n=200 s=4:  72%|███████▏  | 108/150 [01:01<00:23,  1.79it/s]walks m=30 n=200 s=4:  73%|███████▎  | 109/150 [01:02<00:22,  1.80it/s]walks m=30 n=200 s=4:  73%|███████▎  | 110/150 [01:02<00:22,  1.77it/s]walks m=30 n=200 s=4:  74%|███████▍  | 111/150 [01:03<00:21,  1.79it/s]walks m=30 n=200 s=4:  75%|███████▍  | 112/150 [01:04<00:23,  1.59it/s]walks m=30 n=200 s=4:  75%|███████▌  | 113/150 [01:04<00:22,  1.65it/s]walks m=30 n=200 s=4:  76%|███████▌  | 114/150 [01:05<00:21,  1.69it/s]walks m=30 n=200 s=4:  77%|███████▋  | 115/150 [01:05<00:20,  1.74it/s]walks m=30 n=200 s=4:  77%|███████▋  | 116/150 [01:06<00:19,  1.77it/s]walks m=30 n=200 s=4:  78%|███████▊  | 117/150 [01:06<00:18,  1.80it/s]walks m=30 n=200 s=4:  79%|███████▊  | 118/150 [01:07<00:18,  1.75it/s]walks m=30 n=200 s=4:  79%|███████▉  | 119/150 [01:08<00:17,  1.77it/s]walks m=30 n=200 s=4:  80%|████████  | 120/150 [01:08<00:16,  1.79it/s]walks m=30 n=200 s=4:  81%|████████  | 121/150 [01:09<00:16,  1.73it/s]walks m=30 n=200 s=4:  81%|████████▏ | 122/150 [01:09<00:15,  1.76it/s]walks m=30 n=200 s=4:  82%|████████▏ | 123/150 [01:10<00:15,  1.79it/s]walks m=30 n=200 s=4:  83%|████████▎ | 124/150 [01:10<00:14,  1.79it/s]walks m=30 n=200 s=4:  83%|████████▎ | 125/150 [01:11<00:13,  1.80it/s]walks m=30 n=200 s=4:  84%|████████▍ | 126/150 [01:11<00:13,  1.82it/s]walks m=30 n=200 s=4:  85%|████████▍ | 127/150 [01:12<00:12,  1.77it/s]walks m=30 n=200 s=4:  85%|████████▌ | 128/150 [01:13<00:13,  1.68it/s]walks m=30 n=200 s=4:  86%|████████▌ | 129/150 [01:13<00:12,  1.73it/s]walks m=30 n=200 s=4:  87%|████████▋ | 130/150 [01:14<00:11,  1.78it/s]walks m=30 n=200 s=4:  87%|████████▋ | 131/150 [01:14<00:10,  1.75it/s]walks m=30 n=200 s=4:  88%|████████▊ | 132/150 [01:15<00:10,  1.76it/s]walks m=30 n=200 s=4:  89%|████████▊ | 133/150 [01:15<00:09,  1.79it/s]walks m=30 n=200 s=4:  89%|████████▉ | 134/150 [01:16<00:08,  1.80it/s]walks m=30 n=200 s=4:  90%|█████████ | 135/150 [01:17<00:08,  1.82it/s]walks m=30 n=200 s=4:  91%|█████████ | 136/150 [01:17<00:07,  1.83it/s]walks m=30 n=200 s=4:  91%|█████████▏| 137/150 [01:18<00:07,  1.84it/s]walks m=30 n=200 s=4:  92%|█████████▏| 138/150 [01:18<00:06,  1.85it/s]walks m=30 n=200 s=4:  93%|█████████▎| 139/150 [01:19<00:05,  1.84it/s]walks m=30 n=200 s=4:  93%|█████████▎| 140/150 [01:19<00:05,  1.84it/s]walks m=30 n=200 s=4:  94%|█████████▍| 141/150 [01:20<00:05,  1.80it/s]walks m=30 n=200 s=4:  95%|█████████▍| 142/150 [01:20<00:04,  1.83it/s]walks m=30 n=200 s=4:  95%|█████████▌| 143/150 [01:21<00:03,  1.83it/s]walks m=30 n=200 s=4:  96%|█████████▌| 144/150 [01:21<00:03,  1.84it/s]walks m=30 n=200 s=4:  97%|█████████▋| 145/150 [01:22<00:02,  1.85it/s]walks m=30 n=200 s=4:  97%|█████████▋| 146/150 [01:23<00:02,  1.84it/s]walks m=30 n=200 s=4:  98%|█████████▊| 147/150 [01:23<00:01,  1.85it/s]walks m=30 n=200 s=4:  99%|█████████▊| 148/150 [01:24<00:01,  1.86it/s]walks m=30 n=200 s=4:  99%|█████████▉| 149/150 [01:24<00:00,  1.87it/s]walks m=30 n=200 s=4: 100%|██████████| 150/150 [01:25<00:00,  1.87it/s]walks m=30 n=200 s=4: 100%|██████████| 150/150 [01:25<00:00,  1.76it/s]
+
+Step-landing epsilon  (m=30, n=200, sig_bits=4, samples=150)
+unit roundoff u = 2^-(sig_bits+1) = 3.125e-02
+pooled per-coordinate additive epsilon (rounding step - ideal step):
+  direction eps          mean=+1.489e-04  sigma_IQR=5.428e-03  Q1=-3.665e-03  med=-4.264e-06  Q3=+3.657e-03  (raw std=3.75e+00)
+  z-space eps (delta*eps) mean=-2.340e-06  sigma_IQR=4.196e-03  Q1=-2.832e-03  med=-6.284e-07  Q3=+2.828e-03  (raw std=2.99e-02)
+  -> effective additive-noise sigma (z-space, IQR-based) = 4.196e-03  (compare to sweep noise_std, e.g. 2^-8=3.906e-03, 2^-10=9.766e-04)
+saved results/step_landing_m30_n200_s4.png
+walks m=30 n=200 s=8:   0%|          | 0/150 [00:00<?, ?it/s]walks m=30 n=200 s=8:   1%|          | 1/150 [00:00<01:20,  1.85it/s]walks m=30 n=200 s=8:   1%|▏         | 2/150 [00:01<01:22,  1.80it/s]walks m=30 n=200 s=8:   2%|▏         | 3/150 [00:01<01:21,  1.81it/s]walks m=30 n=200 s=8:   3%|▎         | 4/150 [00:02<01:21,  1.80it/s]walks m=30 n=200 s=8:   3%|▎         | 5/150 [00:02<01:20,  1.81it/s]walks m=30 n=200 s=8:   4%|▍         | 6/150 [00:03<01:19,  1.82it/s]walks m=30 n=200 s=8:   5%|▍         | 7/150 [00:03<01:18,  1.83it/s]walks m=30 n=200 s=8:   5%|▌         | 8/150 [00:04<01:17,  1.84it/s]walks m=30 n=200 s=8:   6%|▌         | 9/150 [00:04<01:18,  1.80it/s]walks m=30 n=200 s=8:   7%|▋         | 10/150 [00:05<01:22,  1.70it/s]walks m=30 n=200 s=8:   7%|▋         | 11/150 [00:06<01:21,  1.71it/s]walks m=30 n=200 s=8:   8%|▊         | 12/150 [00:06<01:19,  1.74it/s]walks m=30 n=200 s=8:   9%|▊         | 13/150 [00:07<01:18,  1.74it/s]walks m=30 n=200 s=8:   9%|▉         | 14/150 [00:07<01:16,  1.78it/s]walks m=30 n=200 s=8:  10%|█         | 15/150 [00:08<01:14,  1.81it/s]walks m=30 n=200 s=8:  11%|█         | 16/150 [00:08<01:13,  1.83it/s]walks m=30 n=200 s=8:  11%|█▏        | 17/150 [00:09<01:12,  1.84it/s]walks m=30 n=200 s=8:  12%|█▏        | 18/150 [00:10<01:11,  1.85it/s]walks m=30 n=200 s=8:  13%|█▎        | 19/150 [00:10<01:11,  1.84it/s]walks m=30 n=200 s=8:  13%|█▎        | 20/150 [00:11<01:11,  1.81it/s]walks m=30 n=200 s=8:  14%|█▍        | 21/150 [00:11<01:10,  1.83it/s]walks m=30 n=200 s=8:  15%|█▍        | 22/150 [00:12<01:10,  1.82it/s]walks m=30 n=200 s=8:  15%|█▌        | 23/150 [00:12<01:09,  1.83it/s]walks m=30 n=200 s=8:  16%|█▌        | 24/150 [00:13<01:09,  1.81it/s]walks m=30 n=200 s=8:  17%|█▋        | 25/150 [00:13<01:09,  1.81it/s]walks m=30 n=200 s=8:  17%|█▋        | 26/150 [00:14<01:07,  1.83it/s]walks m=30 n=200 s=8:  18%|█▊        | 27/150 [00:14<01:06,  1.84it/s]walks m=30 n=200 s=8:  19%|█▊        | 28/150 [00:15<01:06,  1.83it/s]walks m=30 n=200 s=8:  19%|█▉        | 29/150 [00:16<01:07,  1.79it/s]walks m=30 n=200 s=8:  20%|██        | 30/150 [00:16<01:06,  1.80it/s]walks m=30 n=200 s=8:  21%|██        | 31/150 [00:17<01:05,  1.81it/s]walks m=30 n=200 s=8:  21%|██▏       | 32/150 [00:17<01:04,  1.82it/s]walks m=30 n=200 s=8:  22%|██▏       | 33/150 [00:18<01:04,  1.81it/s]walks m=30 n=200 s=8:  23%|██▎       | 34/150 [00:18<01:03,  1.82it/s]walks m=30 n=200 s=8:  23%|██▎       | 35/150 [00:19<01:02,  1.83it/s]walks m=30 n=200 s=8:  24%|██▍       | 36/150 [00:19<01:02,  1.81it/s]walks m=30 n=200 s=8:  25%|██▍       | 37/150 [00:20<01:07,  1.67it/s]walks m=30 n=200 s=8:  25%|██▌       | 38/150 [00:21<01:05,  1.70it/s]walks m=30 n=200 s=8:  26%|██▌       | 39/150 [00:21<01:03,  1.74it/s]walks m=30 n=200 s=8:  27%|██▋       | 40/150 [00:22<01:02,  1.76it/s]walks m=30 n=200 s=8:  27%|██▋       | 41/150 [00:22<01:01,  1.78it/s]walks m=30 n=200 s=8:  28%|██▊       | 42/150 [00:23<00:59,  1.80it/s]walks m=30 n=200 s=8:  29%|██▊       | 43/150 [00:23<00:58,  1.82it/s]walks m=30 n=200 s=8:  29%|██▉       | 44/150 [00:24<00:57,  1.84it/s]walks m=30 n=200 s=8:  30%|███       | 45/150 [00:24<00:57,  1.84it/s]walks m=30 n=200 s=8:  31%|███       | 46/150 [00:25<01:01,  1.68it/s]walks m=30 n=200 s=8:  31%|███▏      | 47/150 [00:26<01:00,  1.71it/s]walks m=30 n=200 s=8:  32%|███▏      | 48/150 [00:26<00:59,  1.73it/s]walks m=30 n=200 s=8:  33%|███▎      | 49/150 [00:27<00:58,  1.72it/s]walks m=30 n=200 s=8:  33%|███▎      | 50/150 [00:28<01:00,  1.65it/s]walks m=30 n=200 s=8:  34%|███▍      | 51/150 [00:28<01:00,  1.65it/s]walks m=30 n=200 s=8:  35%|███▍      | 52/150 [00:29<00:58,  1.68it/s]walks m=30 n=200 s=8:  35%|███▌      | 53/150 [00:29<00:56,  1.72it/s]walks m=30 n=200 s=8:  36%|███▌      | 54/150 [00:30<00:54,  1.77it/s]walks m=30 n=200 s=8:  37%|███▋      | 55/150 [00:30<00:53,  1.78it/s]walks m=30 n=200 s=8:  37%|███▋      | 56/150 [00:31<00:52,  1.80it/s]walks m=30 n=200 s=8:  38%|███▊      | 57/150 [00:31<00:51,  1.81it/s]walks m=30 n=200 s=8:  39%|███▊      | 58/150 [00:32<00:50,  1.83it/s]walks m=30 n=200 s=8:  39%|███▉      | 59/150 [00:33<00:54,  1.67it/s]walks m=30 n=200 s=8:  40%|████      | 60/150 [00:33<00:52,  1.70it/s]walks m=30 n=200 s=8:  41%|████      | 61/150 [00:34<00:50,  1.75it/s]walks m=30 n=200 s=8:  41%|████▏     | 62/150 [00:34<00:50,  1.76it/s]walks m=30 n=200 s=8:  42%|████▏     | 63/150 [00:35<00:50,  1.73it/s]walks m=30 n=200 s=8:  43%|████▎     | 64/150 [00:36<00:48,  1.77it/s]walks m=30 n=200 s=8:  43%|████▎     | 65/150 [00:36<00:49,  1.70it/s]walks m=30 n=200 s=8:  44%|████▍     | 66/150 [00:37<00:49,  1.71it/s]walks m=30 n=200 s=8:  45%|████▍     | 67/150 [00:37<00:48,  1.73it/s]walks m=30 n=200 s=8:  45%|████▌     | 68/150 [00:38<00:47,  1.74it/s]walks m=30 n=200 s=8:  46%|████▌     | 69/150 [00:39<00:51,  1.56it/s]walks m=30 n=200 s=8:  47%|████▋     | 70/150 [00:39<00:55,  1.45it/s]walks m=30 n=200 s=8:  47%|████▋     | 71/150 [00:40<00:58,  1.36it/s]walks m=30 n=200 s=8:  48%|████▊     | 72/150 [00:41<00:57,  1.36it/s]walks m=30 n=200 s=8:  49%|████▊     | 73/150 [00:42<00:52,  1.47it/s]walks m=30 n=200 s=8:  49%|████▉     | 74/150 [00:42<00:51,  1.47it/s]walks m=30 n=200 s=8:  50%|█████     | 75/150 [00:43<00:48,  1.55it/s]walks m=30 n=200 s=8:  51%|█████     | 76/150 [00:43<00:45,  1.63it/s]walks m=30 n=200 s=8:  51%|█████▏    | 77/150 [00:44<00:43,  1.67it/s]walks m=30 n=200 s=8:  52%|█████▏    | 78/150 [00:45<00:42,  1.71it/s]walks m=30 n=200 s=8:  53%|█████▎    | 79/150 [00:45<00:45,  1.56it/s]walks m=30 n=200 s=8:  53%|█████▎    | 80/150 [00:46<00:43,  1.60it/s]walks m=30 n=200 s=8:  54%|█████▍    | 81/150 [00:46<00:41,  1.65it/s]walks m=30 n=200 s=8:  55%|█████▍    | 82/150 [00:47<00:40,  1.68it/s]walks m=30 n=200 s=8:  55%|█████▌    | 83/150 [00:48<00:39,  1.70it/s]walks m=30 n=200 s=8:  56%|█████▌    | 84/150 [00:48<00:38,  1.71it/s]walks m=30 n=200 s=8:  57%|█████▋    | 85/150 [00:49<00:37,  1.73it/s]walks m=30 n=200 s=8:  57%|█████▋    | 86/150 [00:49<00:39,  1.60it/s]walks m=30 n=200 s=8:  58%|█████▊    | 87/150 [00:50<00:39,  1.60it/s]walks m=30 n=200 s=8:  59%|█████▊    | 88/150 [00:51<00:41,  1.51it/s]walks m=30 n=200 s=8:  59%|█████▉    | 89/150 [00:51<00:39,  1.53it/s]walks m=30 n=200 s=8:  60%|██████    | 90/150 [00:52<00:37,  1.60it/s]walks m=30 n=200 s=8:  61%|██████    | 91/150 [00:53<00:36,  1.62it/s]walks m=30 n=200 s=8:  61%|██████▏   | 92/150 [00:53<00:34,  1.69it/s]walks m=30 n=200 s=8:  62%|██████▏   | 93/150 [00:54<00:32,  1.73it/s]walks m=30 n=200 s=8:  63%|██████▎   | 94/150 [00:54<00:31,  1.77it/s]walks m=30 n=200 s=8:  63%|██████▎   | 95/150 [00:55<00:30,  1.80it/s]walks m=30 n=200 s=8:  64%|██████▍   | 96/150 [00:55<00:29,  1.82it/s]walks m=30 n=200 s=8:  65%|██████▍   | 97/150 [00:56<00:29,  1.80it/s]walks m=30 n=200 s=8:  65%|██████▌   | 98/150 [00:56<00:28,  1.80it/s]walks m=30 n=200 s=8:  66%|██████▌   | 99/150 [00:57<00:28,  1.78it/s]walks m=30 n=200 s=8:  67%|██████▋   | 100/150 [00:58<00:27,  1.80it/s]walks m=30 n=200 s=8:  67%|██████▋   | 101/150 [00:58<00:27,  1.81it/s]walks m=30 n=200 s=8:  68%|██████▊   | 102/150 [00:59<00:26,  1.83it/s]walks m=30 n=200 s=8:  69%|██████▊   | 103/150 [00:59<00:25,  1.84it/s]walks m=30 n=200 s=8:  69%|██████▉   | 104/150 [01:00<00:25,  1.84it/s]walks m=30 n=200 s=8:  70%|███████   | 105/150 [01:00<00:24,  1.85it/s]walks m=30 n=200 s=8:  71%|███████   | 106/150 [01:01<00:23,  1.86it/s]walks m=30 n=200 s=8:  71%|███████▏  | 107/150 [01:01<00:23,  1.87it/s]walks m=30 n=200 s=8:  72%|███████▏  | 108/150 [01:02<00:22,  1.87it/s]walks m=30 n=200 s=8:  73%|███████▎  | 109/150 [01:02<00:21,  1.87it/s]walks m=30 n=200 s=8:  73%|███████▎  | 110/150 [01:03<00:21,  1.87it/s]walks m=30 n=200 s=8:  74%|███████▍  | 111/150 [01:03<00:20,  1.87it/s]walks m=30 n=200 s=8:  75%|███████▍  | 112/150 [01:04<00:20,  1.87it/s]walks m=30 n=200 s=8:  75%|███████▌  | 113/150 [01:05<00:20,  1.82it/s]walks m=30 n=200 s=8:  76%|███████▌  | 114/150 [01:05<00:21,  1.65it/s]walks m=30 n=200 s=8:  77%|███████▋  | 115/150 [01:06<00:20,  1.70it/s]walks m=30 n=200 s=8:  77%|███████▋  | 116/150 [01:06<00:20,  1.67it/s]walks m=30 n=200 s=8:  78%|███████▊  | 117/150 [01:07<00:19,  1.71it/s]walks m=30 n=200 s=8:  79%|███████▊  | 118/150 [01:08<00:18,  1.69it/s]walks m=30 n=200 s=8:  79%|███████▉  | 119/150 [01:08<00:19,  1.61it/s]walks m=30 n=200 s=8:  80%|████████  | 120/150 [01:09<00:17,  1.68it/s]walks m=30 n=200 s=8:  81%|████████  | 121/150 [01:09<00:16,  1.73it/s]walks m=30 n=200 s=8:  81%|████████▏ | 122/150 [01:10<00:16,  1.74it/s]walks m=30 n=200 s=8:  82%|████████▏ | 123/150 [01:10<00:15,  1.78it/s]walks m=30 n=200 s=8:  83%|████████▎ | 124/150 [01:11<00:14,  1.79it/s]walks m=30 n=200 s=8:  83%|████████▎ | 125/150 [01:12<00:13,  1.81it/s]walks m=30 n=200 s=8:  84%|████████▍ | 126/150 [01:12<00:13,  1.83it/s]walks m=30 n=200 s=8:  85%|████████▍ | 127/150 [01:13<00:12,  1.82it/s]walks m=30 n=200 s=8:  85%|████████▌ | 128/150 [01:13<00:12,  1.80it/s]walks m=30 n=200 s=8:  86%|████████▌ | 129/150 [01:14<00:11,  1.79it/s]walks m=30 n=200 s=8:  87%|████████▋ | 130/150 [01:14<00:11,  1.80it/s]walks m=30 n=200 s=8:  87%|████████▋ | 131/150 [01:15<00:10,  1.80it/s]walks m=30 n=200 s=8:  88%|████████▊ | 132/150 [01:15<00:09,  1.82it/s]walks m=30 n=200 s=8:  89%|████████▊ | 133/150 [01:16<00:09,  1.82it/s]walks m=30 n=200 s=8:  89%|████████▉ | 134/150 [01:17<00:09,  1.76it/s]walks m=30 n=200 s=8:  90%|█████████ | 135/150 [01:17<00:08,  1.75it/s]walks m=30 n=200 s=8:  91%|█████████ | 136/150 [01:18<00:07,  1.77it/s]walks m=30 n=200 s=8:  91%|█████████▏| 137/150 [01:18<00:07,  1.78it/s]walks m=30 n=200 s=8:  92%|█████████▏| 138/150 [01:19<00:06,  1.76it/s]walks m=30 n=200 s=8:  93%|█████████▎| 139/150 [01:19<00:06,  1.75it/s]walks m=30 n=200 s=8:  93%|█████████▎| 140/150 [01:20<00:06,  1.58it/s]walks m=30 n=200 s=8:  94%|█████████▍| 141/150 [01:21<00:05,  1.63it/s]walks m=30 n=200 s=8:  95%|█████████▍| 142/150 [01:21<00:04,  1.69it/s]walks m=30 n=200 s=8:  95%|█████████▌| 143/150 [01:22<00:04,  1.75it/s]walks m=30 n=200 s=8:  96%|█████████▌| 144/150 [01:22<00:03,  1.77it/s]walks m=30 n=200 s=8:  97%|█████████▋| 145/150 [01:23<00:02,  1.75it/s]walks m=30 n=200 s=8:  97%|█████████▋| 146/150 [01:24<00:02,  1.58it/s]walks m=30 n=200 s=8:  98%|█████████▊| 147/150 [01:24<00:01,  1.62it/s]walks m=30 n=200 s=8:  99%|█████████▊| 148/150 [01:25<00:01,  1.57it/s]walks m=30 n=200 s=8:  99%|█████████▉| 149/150 [01:26<00:00,  1.64it/s]walks m=30 n=200 s=8: 100%|██████████| 150/150 [01:26<00:00,  1.70it/s]walks m=30 n=200 s=8: 100%|██████████| 150/150 [01:26<00:00,  1.73it/s]
+
+Step-landing epsilon  (m=30, n=200, sig_bits=8, samples=150)
+unit roundoff u = 2^-(sig_bits+1) = 1.953e-03
+pooled per-coordinate additive epsilon (rounding step - ideal step):
+  direction eps          mean=+5.031e-04  sigma_IQR=3.483e-04  Q1=-2.352e-04  med=-1.447e-07  Q3=+2.346e-04  (raw std=4.82e+00)
+  z-space eps (delta*eps) mean=+4.874e-08  sigma_IQR=2.689e-04  Q1=-1.817e-04  med=-1.980e-07  Q3=+1.811e-04  (raw std=6.63e-03)
+  -> effective additive-noise sigma (z-space, IQR-based) = 2.689e-04  (compare to sweep noise_std, e.g. 2^-8=3.906e-03, 2^-10=9.766e-04)
+saved results/step_landing_m30_n200_s8.png
+walks m=30 n=200 s=23:   0%|          | 0/150 [00:00<?, ?it/s]walks m=30 n=200 s=23:   1%|          | 1/150 [00:00<01:31,  1.62it/s]walks m=30 n=200 s=23:   1%|▏         | 2/150 [00:01<01:25,  1.73it/s]walks m=30 n=200 s=23:   2%|▏         | 3/150 [00:01<01:26,  1.70it/s]walks m=30 n=200 s=23:   3%|▎         | 4/150 [00:02<01:30,  1.61it/s]walks m=30 n=200 s=23:   3%|▎         | 5/150 [00:02<01:26,  1.67it/s]walks m=30 n=200 s=23:   4%|▍         | 6/150 [00:03<01:24,  1.70it/s]walks m=30 n=200 s=23:   5%|▍         | 7/150 [00:04<01:21,  1.75it/s]walks m=30 n=200 s=23:   5%|▌         | 8/150 [00:04<01:19,  1.78it/s]walks m=30 n=200 s=23:   6%|▌         | 9/150 [00:05<01:18,  1.79it/s]walks m=30 n=200 s=23:   7%|▋         | 10/150 [00:05<01:17,  1.80it/s]walks m=30 n=200 s=23:   7%|▋         | 11/150 [00:06<01:17,  1.79it/s]walks m=30 n=200 s=23:   8%|▊         | 12/150 [00:07<01:23,  1.66it/s]walks m=30 n=200 s=23:   9%|▊         | 13/150 [00:07<01:21,  1.69it/s]walks m=30 n=200 s=23:   9%|▉         | 14/150 [00:08<01:19,  1.72it/s]walks m=30 n=200 s=23:  10%|█         | 15/150 [00:08<01:17,  1.74it/s]walks m=30 n=200 s=23:  11%|█         | 16/150 [00:09<01:17,  1.73it/s]walks m=30 n=200 s=23:  11%|█▏        | 17/150 [00:09<01:16,  1.74it/s]walks m=30 n=200 s=23:  12%|█▏        | 18/150 [00:10<01:14,  1.77it/s]walks m=30 n=200 s=23:  13%|█▎        | 19/150 [00:11<01:24,  1.55it/s]walks m=30 n=200 s=23:  13%|█▎        | 20/150 [00:11<01:20,  1.61it/s]walks m=30 n=200 s=23:  14%|█▍        | 21/150 [00:12<01:18,  1.63it/s]walks m=30 n=200 s=23:  15%|█▍        | 22/150 [00:12<01:16,  1.67it/s]walks m=30 n=200 s=23:  15%|█▌        | 23/150 [00:13<01:13,  1.72it/s]walks m=30 n=200 s=23:  16%|█▌        | 24/150 [00:14<01:11,  1.77it/s]walks m=30 n=200 s=23:  17%|█▋        | 25/150 [00:14<01:09,  1.79it/s]walks m=30 n=200 s=23:  17%|█▋        | 26/150 [00:15<01:10,  1.76it/s]walks m=30 n=200 s=23:  18%|█▊        | 27/150 [00:15<01:09,  1.78it/s]walks m=30 n=200 s=23:  19%|█▊        | 28/150 [00:16<01:26,  1.42it/s]walks m=30 n=200 s=23:  19%|█▉        | 29/150 [00:17<01:20,  1.50it/s]walks m=30 n=200 s=23:  20%|██        | 30/150 [00:17<01:16,  1.58it/s]walks m=30 n=200 s=23:  21%|██        | 31/150 [00:18<01:12,  1.64it/s]walks m=30 n=200 s=23:  21%|██▏       | 32/150 [00:19<01:13,  1.60it/s]walks m=30 n=200 s=23:  22%|██▏       | 33/150 [00:19<01:11,  1.63it/s]walks m=30 n=200 s=23:  23%|██▎       | 34/150 [00:20<01:08,  1.69it/s]walks m=30 n=200 s=23:  23%|██▎       | 35/150 [00:20<01:06,  1.73it/s]walks m=30 n=200 s=23:  24%|██▍       | 36/150 [00:21<01:08,  1.66it/s]walks m=30 n=200 s=23:  25%|██▍       | 37/150 [00:22<01:07,  1.68it/s]walks m=30 n=200 s=23:  25%|██▌       | 38/150 [00:22<01:09,  1.60it/s]walks m=30 n=200 s=23:  26%|██▌       | 39/150 [00:23<01:07,  1.64it/s]walks m=30 n=200 s=23:  27%|██▋       | 40/150 [00:23<01:05,  1.69it/s]walks m=30 n=200 s=23:  27%|██▋       | 41/150 [00:24<01:05,  1.67it/s]walks m=30 n=200 s=23:  28%|██▊       | 42/150 [00:25<01:04,  1.67it/s]walks m=30 n=200 s=23:  29%|██▊       | 43/150 [00:25<01:07,  1.58it/s]walks m=30 n=200 s=23:  29%|██▉       | 44/150 [00:26<01:04,  1.63it/s]walks m=30 n=200 s=23:  30%|███       | 45/150 [00:26<01:01,  1.70it/s]walks m=30 n=200 s=23:  31%|███       | 46/150 [00:27<00:59,  1.74it/s]walks m=30 n=200 s=23:  31%|███▏      | 47/150 [00:27<00:58,  1.75it/s]walks m=30 n=200 s=23:  32%|███▏      | 48/150 [00:28<00:57,  1.78it/s]walks m=30 n=200 s=23:  33%|███▎      | 49/150 [00:29<00:55,  1.81it/s]walks m=30 n=200 s=23:  33%|███▎      | 50/150 [00:29<00:54,  1.82it/s]walks m=30 n=200 s=23:  34%|███▍      | 51/150 [00:30<00:53,  1.83it/s]walks m=30 n=200 s=23:  35%|███▍      | 52/150 [00:30<00:54,  1.78it/s]walks m=30 n=200 s=23:  35%|███▌      | 53/150 [00:31<00:55,  1.76it/s]walks m=30 n=200 s=23:  36%|███▌      | 54/150 [00:31<00:54,  1.77it/s]walks m=30 n=200 s=23:  37%|███▋      | 55/150 [00:32<00:53,  1.76it/s]walks m=30 n=200 s=23:  37%|███▋      | 56/150 [00:33<00:56,  1.67it/s]walks m=30 n=200 s=23:  38%|███▊      | 57/150 [00:33<00:55,  1.67it/s]walks m=30 n=200 s=23:  39%|███▊      | 58/150 [00:34<00:57,  1.61it/s]walks m=30 n=200 s=23:  39%|███▉      | 59/150 [00:34<00:54,  1.66it/s]walks m=30 n=200 s=23:  40%|████      | 60/150 [00:35<00:53,  1.69it/s]walks m=30 n=200 s=23:  41%|████      | 61/150 [00:36<00:51,  1.72it/s]walks m=30 n=200 s=23:  41%|████▏     | 62/150 [00:36<00:51,  1.70it/s]walks m=30 n=200 s=23:  42%|████▏     | 63/150 [00:37<00:54,  1.60it/s]walks m=30 n=200 s=23:  43%|████▎     | 64/150 [00:37<00:52,  1.64it/s]walks m=30 n=200 s=23:  43%|████▎     | 65/150 [00:38<00:52,  1.63it/s]walks m=30 n=200 s=23:  44%|████▍     | 66/150 [00:39<00:57,  1.45it/s]walks m=30 n=200 s=23:  45%|████▍     | 67/150 [00:39<00:53,  1.54it/s]walks m=30 n=200 s=23:  45%|████▌     | 68/150 [00:40<00:50,  1.62it/s]walks m=30 n=200 s=23:  46%|████▌     | 69/150 [00:41<00:50,  1.62it/s]walks m=30 n=200 s=23:  47%|████▋     | 70/150 [00:41<00:54,  1.46it/s]walks m=30 n=200 s=23:  47%|████▋     | 71/150 [00:42<00:52,  1.51it/s]walks m=30 n=200 s=23:  48%|████▊     | 72/150 [00:43<00:49,  1.58it/s]walks m=30 n=200 s=23:  49%|████▊     | 73/150 [00:44<00:56,  1.37it/s]walks m=30 n=200 s=23:  49%|████▉     | 74/150 [00:44<00:51,  1.47it/s]walks m=30 n=200 s=23:  50%|█████     | 75/150 [00:45<00:48,  1.55it/s]walks m=30 n=200 s=23:  51%|█████     | 76/150 [00:45<00:47,  1.56it/s]walks m=30 n=200 s=23:  51%|█████▏    | 77/150 [00:46<00:45,  1.59it/s]walks m=30 n=200 s=23:  52%|█████▏    | 78/150 [00:47<00:43,  1.65it/s]walks m=30 n=200 s=23:  53%|█████▎    | 79/150 [00:47<00:42,  1.68it/s]walks m=30 n=200 s=23:  53%|█████▎    | 80/150 [00:48<00:40,  1.72it/s]walks m=30 n=200 s=23:  54%|█████▍    | 81/150 [00:48<00:39,  1.74it/s]walks m=30 n=200 s=23:  55%|█████▍    | 82/150 [00:49<00:38,  1.76it/s]walks m=30 n=200 s=23:  55%|█████▌    | 83/150 [00:49<00:37,  1.79it/s]walks m=30 n=200 s=23:  56%|█████▌    | 84/150 [00:50<00:37,  1.77it/s]walks m=30 n=200 s=23:  57%|█████▋    | 85/150 [00:50<00:36,  1.78it/s]walks m=30 n=200 s=23:  57%|█████▋    | 86/150 [00:51<00:35,  1.80it/s]walks m=30 n=200 s=23:  58%|█████▊    | 87/150 [00:51<00:34,  1.83it/s]walks m=30 n=200 s=23:  59%|█████▊    | 88/150 [00:52<00:35,  1.73it/s]walks m=30 n=200 s=23:  59%|█████▉    | 89/150 [00:53<00:34,  1.76it/s]walks m=30 n=200 s=23:  60%|██████    | 90/150 [00:53<00:33,  1.77it/s]walks m=30 n=200 s=23:  61%|██████    | 91/150 [00:54<00:33,  1.79it/s]walks m=30 n=200 s=23:  61%|██████▏   | 92/150 [00:54<00:32,  1.79it/s]walks m=30 n=200 s=23:  62%|██████▏   | 93/150 [00:55<00:31,  1.78it/s]walks m=30 n=200 s=23:  63%|██████▎   | 94/150 [00:55<00:30,  1.81it/s]walks m=30 n=200 s=23:  63%|██████▎   | 95/150 [00:56<00:30,  1.81it/s]walks m=30 n=200 s=23:  64%|██████▍   | 96/150 [00:57<00:31,  1.73it/s]walks m=30 n=200 s=23:  65%|██████▍   | 97/150 [00:57<00:30,  1.72it/s]walks m=30 n=200 s=23:  65%|██████▌   | 98/150 [00:58<00:30,  1.72it/s]walks m=30 n=200 s=23:  66%|██████▌   | 99/150 [00:58<00:31,  1.64it/s]walks m=30 n=200 s=23:  67%|██████▋   | 100/150 [00:59<00:31,  1.61it/s]walks m=30 n=200 s=23:  67%|██████▋   | 101/150 [01:00<00:29,  1.68it/s]walks m=30 n=200 s=23:  68%|██████▊   | 102/150 [01:00<00:27,  1.72it/s]walks m=30 n=200 s=23:  69%|██████▊   | 103/150 [01:01<00:28,  1.65it/s]walks m=30 n=200 s=23:  69%|██████▉   | 104/150 [01:01<00:27,  1.70it/s]walks m=30 n=200 s=23:  70%|███████   | 105/150 [01:02<00:26,  1.72it/s]walks m=30 n=200 s=23:  71%|███████   | 106/150 [01:03<00:26,  1.67it/s]walks m=30 n=200 s=23:  71%|███████▏  | 107/150 [01:03<00:24,  1.72it/s]walks m=30 n=200 s=23:  72%|███████▏  | 108/150 [01:04<00:23,  1.75it/s]walks m=30 n=200 s=23:  73%|███████▎  | 109/150 [01:04<00:23,  1.76it/s]walks m=30 n=200 s=23:  73%|███████▎  | 110/150 [01:05<00:22,  1.77it/s]walks m=30 n=200 s=23:  74%|███████▍  | 111/150 [01:05<00:21,  1.79it/s]walks m=30 n=200 s=23:  75%|███████▍  | 112/150 [01:06<00:23,  1.61it/s]walks m=30 n=200 s=23:  75%|███████▌  | 113/150 [01:07<00:22,  1.61it/s]walks m=30 n=200 s=23:  76%|███████▌  | 114/150 [01:07<00:22,  1.62it/s]walks m=30 n=200 s=23:  77%|███████▋  | 115/150 [01:08<00:20,  1.68it/s]walks m=30 n=200 s=23:  77%|███████▋  | 116/150 [01:09<00:20,  1.66it/s]walks m=30 n=200 s=23:  78%|███████▊  | 117/150 [01:09<00:19,  1.67it/s]walks m=30 n=200 s=23:  79%|███████▊  | 118/150 [01:10<00:18,  1.70it/s]walks m=30 n=200 s=23:  79%|███████▉  | 119/150 [01:11<00:20,  1.53it/s]walks m=30 n=200 s=23:  80%|████████  | 120/150 [01:11<00:18,  1.61it/s]walks m=30 n=200 s=23:  81%|████████  | 121/150 [01:12<00:17,  1.66it/s]walks m=30 n=200 s=23:  81%|████████▏ | 122/150 [01:12<00:16,  1.71it/s]walks m=30 n=200 s=23:  82%|████████▏ | 123/150 [01:13<00:15,  1.71it/s]walks m=30 n=200 s=23:  83%|████████▎ | 124/150 [01:13<00:14,  1.75it/s]walks m=30 n=200 s=23:  83%|████████▎ | 125/150 [01:14<00:14,  1.78it/s]walks m=30 n=200 s=23:  84%|████████▍ | 126/150 [01:14<00:13,  1.81it/s]walks m=30 n=200 s=23:  85%|████████▍ | 127/150 [01:15<00:12,  1.81it/s]walks m=30 n=200 s=23:  85%|████████▌ | 128/150 [01:15<00:12,  1.81it/s]walks m=30 n=200 s=23:  86%|████████▌ | 129/150 [01:16<00:11,  1.82it/s]walks m=30 n=200 s=23:  87%|████████▋ | 130/150 [01:17<00:11,  1.81it/s]walks m=30 n=200 s=23:  87%|████████▋ | 131/150 [01:17<00:10,  1.78it/s]walks m=30 n=200 s=23:  88%|████████▊ | 132/150 [01:18<00:10,  1.78it/s]walks m=30 n=200 s=23:  89%|████████▊ | 133/150 [01:18<00:10,  1.64it/s]walks m=30 n=200 s=23:  89%|████████▉ | 134/150 [01:19<00:09,  1.68it/s]walks m=30 n=200 s=23:  90%|█████████ | 135/150 [01:20<00:08,  1.71it/s]walks m=30 n=200 s=23:  91%|█████████ | 136/150 [01:20<00:08,  1.70it/s]walks m=30 n=200 s=23:  91%|█████████▏| 137/150 [01:21<00:07,  1.73it/s]walks m=30 n=200 s=23:  92%|█████████▏| 138/150 [01:21<00:06,  1.76it/s]walks m=30 n=200 s=23:  93%|█████████▎| 139/150 [01:22<00:06,  1.75it/s]walks m=30 n=200 s=23:  93%|█████████▎| 140/150 [01:22<00:05,  1.78it/s]walks m=30 n=200 s=23:  94%|█████████▍| 141/150 [01:23<00:05,  1.79it/s]walks m=30 n=200 s=23:  95%|█████████▍| 142/150 [01:23<00:04,  1.82it/s]walks m=30 n=200 s=23:  95%|█████████▌| 143/150 [01:24<00:03,  1.83it/s]walks m=30 n=200 s=23:  96%|█████████▌| 144/150 [01:25<00:03,  1.85it/s]walks m=30 n=200 s=23:  97%|█████████▋| 145/150 [01:25<00:02,  1.85it/s]walks m=30 n=200 s=23:  97%|█████████▋| 146/150 [01:26<00:02,  1.81it/s]walks m=30 n=200 s=23:  98%|█████████▊| 147/150 [01:26<00:01,  1.80it/s]walks m=30 n=200 s=23:  99%|█████████▊| 148/150 [01:27<00:01,  1.81it/s]walks m=30 n=200 s=23:  99%|█████████▉| 149/150 [01:27<00:00,  1.81it/s]walks m=30 n=200 s=23: 100%|██████████| 150/150 [01:28<00:00,  1.76it/s]walks m=30 n=200 s=23: 100%|██████████| 150/150 [01:28<00:00,  1.70it/s]
+
+Step-landing epsilon  (m=30, n=200, sig_bits=23, samples=150)
+unit roundoff u = 2^-(sig_bits+1) = 5.960e-08
+pooled per-coordinate additive epsilon (rounding step - ideal step):
+  direction eps          mean=+7.759e-08  sigma_IQR=1.064e-08  Q1=-7.181e-09  med=-3.693e-13  Q3=+7.172e-09  (raw std=1.54e-03)
+  z-space eps (delta*eps) mean=+4.629e-11  sigma_IQR=8.224e-09  Q1=-5.550e-09  med=-3.038e-12  Q3=+5.545e-09  (raw std=7.18e-07)
+  -> effective additive-noise sigma (z-space, IQR-based) = 8.224e-09  (compare to sweep noise_std, e.g. 2^-8=3.906e-03, 2^-10=9.766e-04)
+saved results/step_landing_m30_n200_s23.png
+=== done in 262s ===
+
+=== .venv/bin/python -u phase_heatmap.py ===
+66 cells to compute
+Loading Higgs from OpenML (data_id=23512), features [0, 1], n=1600...
+heatmap cells:   0%|          | 0/66 [00:00<?, ?it/s]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:   2%|▏         | 1/66 [00:06<06:52,  6.35s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:   3%|▎         | 2/66 [00:17<09:53,  9.27s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:   5%|▍         | 3/66 [00:33<12:52, 12.26s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:   6%|▌         | 4/66 [01:09<22:21, 21.64s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:   8%|▊         | 5/66 [02:30<43:41, 42.98s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+heatmap cells:   9%|▉         | 6/66 [05:59<1:39:31, 99.52s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  11%|█         | 7/66 [06:05<1:07:46, 68.93s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+heatmap cells:  12%|█▏        | 8/66 [06:13<47:47, 49.44s/it]  /Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  14%|█▎        | 9/66 [06:29<37:05, 39.04s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+heatmap cells:  15%|█▌        | 10/66 [07:02<34:50, 37.33s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  17%|█▋        | 11/66 [08:17<44:44, 48.80s/it]/Users/emile/Documents/gsw-1/lpla.py:141: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / L[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  18%|█▊        | 12/66 [11:50<1:28:52, 98.75s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  20%|█▉        | 13/66 [11:55<1:02:03, 70.25s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  21%|██        | 14/66 [12:02<44:22, 51.20s/it]  /Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  23%|██▎       | 15/66 [12:18<34:28, 40.56s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  24%|██▍       | 16/66 [12:52<32:11, 38.62s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  26%|██▌       | 17/66 [14:05<40:04, 49.07s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  27%|██▋       | 18/66 [17:31<1:16:45, 95.95s/it]heatmap cells:  29%|██▉       | 19/66 [17:35<53:31, 68.33s/it]  heatmap cells:  30%|███       | 20/66 [17:42<38:29, 50.20s/it]heatmap cells:  32%|███▏      | 21/66 [17:57<29:36, 39.47s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  33%|███▎      | 22/66 [18:28<27:04, 36.92s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  35%|███▍      | 23/66 [19:40<34:04, 47.54s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  36%|███▋      | 24/66 [22:45<1:02:03, 88.65s/it]heatmap cells:  38%|███▊      | 25/66 [22:49<43:12, 63.24s/it]  /Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  39%|███▉      | 26/66 [22:55<30:51, 46.28s/it]heatmap cells:  41%|████      | 27/66 [23:09<23:39, 36.40s/it]heatmap cells:  42%|████▏     | 28/66 [23:37<21:34, 34.06s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  44%|████▍     | 29/66 [24:46<27:21, 44.36s/it]/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+/Users/emile/Documents/gsw-1/lpla.py:129: RuntimeWarning: divide by zero encountered in scalar divide
+  x[i] = r(s / R[i, i])
+heatmap cells:  45%|████▌     | 30/66 [27:42<50:25, 84.03s/it]heatmap cells:  47%|████▋     | 31/66 [27:46<34:59, 59.97s/it]heatmap cells:  48%|████▊     | 32/66 [27:53<24:56, 44.01s/it]heatmap cells:  50%|█████     | 33/66 [28:06<19:06, 34.74s/it]heatmap cells:  52%|█████▏    | 34/66 [28:34<17:30, 32.83s/it]heatmap cells:  53%|█████▎    | 35/66 [29:42<22:22, 43.32s/it]heatmap cells:  55%|█████▍    | 36/66 [34:13<55:42, 111.41s/it]heatmap cells:  56%|█████▌    | 37/66 [34:16<38:15, 79.15s/it] heatmap cells:  58%|█████▊    | 38/66 [34:23<26:44, 57.32s/it]heatmap cells:  59%|█████▉    | 39/66 [35:26<26:39, 59.23s/it]heatmap cells:  61%|██████    | 40/66 [35:55<21:40, 50.04s/it]heatmap cells:  62%|██████▏   | 41/66 [38:19<32:31, 78.07s/it]heatmap cells:  64%|██████▎   | 42/66 [41:19<43:29, 108.71s/it]heatmap cells:  65%|██████▌   | 43/66 [41:23<29:37, 77.27s/it] heatmap cells:  67%|██████▋   | 44/66 [41:29<20:33, 56.05s/it]heatmap cells:  68%|██████▊   | 45/66 [41:42<15:06, 43.17s/it]heatmap cells:  70%|██████▉   | 46/66 [42:11<12:56, 38.83s/it]heatmap cells:  71%|███████   | 47/66 [43:22<15:20, 48.47s/it]heatmap cells:  73%|███████▎  | 48/66 [46:35<27:32, 91.81s/it]heatmap cells:  74%|███████▍  | 49/66 [46:40<18:39, 65.83s/it]heatmap cells:  76%|███████▌  | 50/66 [46:48<12:54, 48.38s/it]heatmap cells:  77%|███████▋  | 51/66 [47:01<09:28, 37.88s/it]heatmap cells:  79%|███████▉  | 52/66 [47:35<08:34, 36.72s/it]heatmap cells:  80%|████████  | 53/66 [49:01<11:10, 51.57s/it]heatmap cells:  82%|████████▏ | 54/66 [53:34<23:34, 117.87s/it]heatmap cells:  83%|████████▎ | 55/66 [53:40<15:25, 84.17s/it] heatmap cells:  85%|████████▍ | 56/66 [53:48<10:13, 61.39s/it]heatmap cells:  86%|████████▋ | 57/66 [54:04<07:10, 47.82s/it]heatmap cells:  88%|████████▊ | 58/66 [54:41<05:57, 44.65s/it]heatmap cells:  89%|████████▉ | 59/66 [55:58<06:20, 54.38s/it]heatmap cells:  91%|█████████ | 60/66 [59:04<09:23, 93.89s/it]heatmap cells:  92%|█████████▏| 61/66 [59:08<05:34, 66.94s/it]heatmap cells:  94%|█████████▍| 62/66 [59:15<03:15, 48.97s/it]heatmap cells:  95%|█████████▌| 63/66 [59:30<01:55, 38.59s/it]heatmap cells:  97%|█████████▋| 64/66 [1:00:02<01:13, 36.54s/it]heatmap cells:  98%|█████████▊| 65/66 [1:01:22<00:49, 49.71s/it]heatmap cells: 100%|██████████| 66/66 [1:04:55<00:00, 98.62s/it]heatmap cells: 100%|██████████| 66/66 [1:04:55<00:00, 59.02s/it]
+cached grid -> phase_heatmap_cache.npz
+saved phase_heatmap.png
+=== done in 3898s ===

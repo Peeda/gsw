@@ -26,7 +26,7 @@ import numpy as np
 from tqdm import tqdm
 
 import lpla
-from precision_sweep import _subgaussian_sigma
+from precision_sweep import _subgaussian_sigma, _plot_inf_norm_ccdf
 
 
 def lower_bound_matrix(n: int) -> np.ndarray:
@@ -43,7 +43,7 @@ def lower_bound_walk(
     a: float,
     chop: Callable | None = None,
     seed: int | None = None,
-) -> float:
+) -> np.ndarray:
     """One GSW rollout on the lower-bound matrix with adversarial error a.
 
     The construction follows Theorem 4.1: for the first L = floor(n/4)
@@ -99,11 +99,8 @@ def lower_bound_walk(
         # freeze anything that hit a boundary
         z = r(np.where(np.abs(z) > 1 - 1e-9, np.sign(z), z))
 
-    # projection onto e_0; final Bz measured in full float64
-    d = np.zeros(m)
-    d[0] = 1.0
-    Bz = B0 @ z
-    return float(d @ Bz)
+    # final Bz measured in full float64 (row 0 is the e_0 projection)
+    return B0 @ z
 
 
 def _valid_for_adversarial(n: int, sig_bits: int) -> bool:
@@ -124,32 +121,37 @@ def lower_bound_sweep(
     if sig_bits_values is None:
         sig_bits_values = [10, 11, 12, 13, 14, 30, 40, 52]
 
-    fig, (ax_n, ax_bits) = plt.subplots(1, 2, figsize=(11, 4))
+    fig, (ax_n, ax_bits, ax_cc) = plt.subplots(1, 3, figsize=(16, 4))
     fig.suptitle("Lower-bound matrix: worst-case sub-Gaussian growth")
+
+    # single pass over all (sig_bits, n) configs; reuse for every panel
+    bz_samples = {}
+    for sig_bits in tqdm(sig_bits_values, desc="sig_bits"):
+        a = 2.0 ** (-sig_bits)
+        chop = None if sig_bits == 52 else lpla.make_round(sig_bits)
+        for n in n_values:
+            B = lower_bound_matrix(n)
+            bz_samples[(sig_bits, n)] = np.stack([
+                lower_bound_walk(B, a, chop, seed=n + 12345 + s)
+                for s in range(num_samples)
+            ], axis=1)  # (m, num_samples)
+
+    def sigma_est(bz):
+        vals = bz[0]  # e_0 projection
+        sm, _ = _subgaussian_sigma(vals)
+        k = min(5, len(vals))
+        fold_sigmas = [_subgaussian_sigma(fold)[0] for fold in np.array_split(vals, k)]
+        return sm, float(np.std(fold_sigmas))
 
     # left plot: sigma vs n for each sig_bits
     colors = plt.cm.viridis(np.linspace(0, 1, len(sig_bits_values)))
     for sig_bits, col in zip(sig_bits_values, colors):
-        a = 2.0 ** (-sig_bits)
-        chop = None if sig_bits == 52 else lpla.make_round(sig_bits)
-        valid_ns = []
-        sigmas = []
-        sigma_errs = []
-        for n in tqdm(n_values, desc=f"sig_bits={sig_bits}"):
-            B = lower_bound_matrix(n)
-            vals = np.array([
-                lower_bound_walk(B, a, chop, seed=n + 12345 + s)
-                for s in range(num_samples)
-            ])
-            sm, _ = _subgaussian_sigma(vals)
-            k = min(5, len(vals))
-            fold_sigmas = [_subgaussian_sigma(fold)[0] for fold in np.array_split(vals, k)]
-            sm_err = float(np.std(fold_sigmas))
-            valid_ns.append(n)
+        sigmas, sigma_errs = [], []
+        for n in n_values:
+            sm, sm_err = sigma_est(bz_samples[(sig_bits, n)])
             sigmas.append(sm)
             sigma_errs.append(sm_err)
-        if valid_ns:
-            ax_n.errorbar(valid_ns, sigmas, yerr=sigma_errs, marker="o", markersize=4, color=col, label=f"{sig_bits}b")
+        ax_n.errorbar(n_values, sigmas, yerr=sigma_errs, marker="o", markersize=4, color=col, label=f"{sig_bits}b")
 
     ax_n.set_xlabel("n")
     ax_n.set_ylabel("σ (moment estimate)")
@@ -158,35 +160,33 @@ def lower_bound_sweep(
     ax_n.set_yscale("log")
     ax_n.legend(title="mantissa bits")
 
-    # right plot: sigma vs sig_bits for each n
+    # middle plot: sigma vs sig_bits for each n
     colors = plt.cm.plasma(np.linspace(0, 1, len(n_values)))
     for n, col in zip(n_values, colors):
-        B = lower_bound_matrix(n)
-        valid_bits = []
-        sigmas = []
-        sigma_errs = []
-        for sig_bits in tqdm(sig_bits_values, desc=f"n={n}"):
-            a = 2.0 ** (-sig_bits)
-            chop = None if sig_bits == 52 else lpla.make_round(sig_bits)
-            vals = np.array([
-                lower_bound_walk(B, a, chop, seed=n + 12345 + s)
-                for s in range(num_samples)
-            ])
-            sm, _ = _subgaussian_sigma(vals)
-            k = min(5, len(vals))
-            fold_sigmas = [_subgaussian_sigma(fold)[0] for fold in np.array_split(vals, k)]
-            sm_err = float(np.std(fold_sigmas))
-            valid_bits.append(sig_bits)
+        sigmas, sigma_errs = [], []
+        for sig_bits in sig_bits_values:
+            sm, sm_err = sigma_est(bz_samples[(sig_bits, n)])
             sigmas.append(sm)
             sigma_errs.append(sm_err)
-        if valid_bits:
-            ax_bits.errorbar(valid_bits, sigmas, yerr=sigma_errs, marker="s", markersize=4, color=col, label=f"n={n}")
+        ax_bits.errorbar(sig_bits_values, sigmas, yerr=sigma_errs, marker="s", markersize=4, color=col, label=f"n={n}")
 
     ax_bits.set_xlabel("mantissa bits (sig_bits)")
     ax_bits.set_ylabel("σ (moment estimate)")
     ax_bits.set_title("σ vs precision")
     ax_bits.set_yscale("log")
     ax_bits.legend(title="n")
+
+    # right plot: ||Bz||_inf CCDF per sig_bits at the largest n
+    n_max = max(n_values)
+    colors = plt.cm.viridis(np.linspace(0, 1, len(sig_bits_values)))
+    for sig_bits, col in zip(sig_bits_values, colors):
+        _plot_inf_norm_ccdf(ax_cc, bz_samples[(sig_bits, n_max)],
+                            f"{sig_bits}b", col)
+    ax_cc.set_yscale("log")
+    ax_cc.set_xlabel("t²")
+    ax_cc.set_ylabel("Pr[‖Bz‖∞ > t]")
+    ax_cc.set_title(f"‖Bz‖∞ CCDF at n={n_max} (dashed: union bound)")
+    ax_cc.legend(title="mantissa bits", fontsize=7)
 
     fig.tight_layout()
     fig.savefig(save_path, dpi=150)

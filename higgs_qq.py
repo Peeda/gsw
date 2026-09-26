@@ -18,6 +18,7 @@ os.environ.setdefault("chop_backend", "numpy")
 for _v in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
     os.environ.setdefault(_v, "1")
 
+import argparse
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -29,6 +30,13 @@ import rollouts
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    rollouts.add_noise_arguments(parser)
+    parser.add_argument("--save", default="higgs_qq.png")
+    args = parser.parse_args()
+    save_path = rollouts.output_path(args.save, args.noise_std)
+    metadata = rollouts.experiment_metadata(args.noise_std, seed=0, matrix="higgs",
+                                           matrix_n=500, num_samples=1000, sig_bits=[2, 12, 52])
     B = load_higgs_matrix(500, seed=0)      # same B as higgs_sweep.py
     m, n = B.shape
     sig_list = [2, 12, 52]
@@ -39,7 +47,7 @@ def main():
         _, _, bz = rollouts.run_samples(
             B, np.eye(m), num_samples,
             sig_bits=None if sb == 52 else sb,
-            noise_std=2 ** (-32), workers=6, seed=0,
+            noise_std=args.noise_std, workers=6, seed=0,
         )
         data[sb] = bz                       # (m, num_samples)
         print(f"{sb}b done: std per coord = {bz.std(axis=1)}")
@@ -90,8 +98,8 @@ def main():
     ax_de.legend(title="mantissa bits")
 
     fig.tight_layout()
-    fig.savefig("higgs_qq.png", dpi=150)
-    print("saved higgs_qq.png")
+    rollouts.save_figure(fig, save_path, metadata)
+    print(f"saved {save_path}")
 
 
 if __name__ == "__main__":

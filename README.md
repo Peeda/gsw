@@ -30,9 +30,9 @@ conda activate gsw
 ```
 
 or a plain venv with `numpy`, `scipy`, `matplotlib`, `tqdm`, `pandas`,
-`scikit-learn`. There is no test suite at the top level; the solver self-check
-is `python lpla.py` (compares the hand-rolled solver against
-`np.linalg.lstsq` at full precision).
+`scikit-learn`. Run the noise-control, reproducibility, and cache tests with
+`python -m unittest -v test_rollouts`. The solver self-check is `python lpla.py`
+(compares the hand-rolled solver against `np.linalg.lstsq` at full precision).
 
 ## Core modules
 
@@ -40,12 +40,66 @@ is `python lpla.py` (compares the hand-rolled solver against
 |---|---|
 | `gsw.py` | the walk. `gram_schmidt_walk(B, chop=None, noise=None, record_trajectory=False) → WalkResult`. `chop` routes the direction solve through `lpla.lstsq`; `noise` perturbs unfrozen `z` coordinates each step. `Bz` is always measured in fp64 on the unrounded input. |
 | `lpla.py` | the precision model. `make_round(sig_bits)` is a round-to-nearest-even mantissa rounder with unbounded exponent (rounding, not IEEE range). `lstsq` is a shape-adaptive Householder QR / LQ min-norm solver with every elementary op rounded; reductions accumulate in fp64. |
-| `rollouts.py` | parallel Monte-Carlo walks over `ProcessPoolExecutor` with per-worker `SeedSequence` streams; returns discrepancy means, direction projections, and full `Bz` samples. |
+| `rollouts.py` | parallel Monte-Carlo walks over `ProcessPoolExecutor` with per-rollout `SeedSequence` streams; returns discrepancy means, direction projections, and full `Bz` samples. |
 | `walk_step.py` | interactive single-walk step-through. |
+
+## Gaussian noise controls and new-run provenance
+
+Main-walk sweeps now default to **no added Gaussian noise**, including their
+float64 references. Use `--noise-std VALUE` for a finite, nonnegative standard
+deviation, or `--no-noise` to disable it explicitly. These options are available
+in `n_subgauss.py`, `bits_subgauss.py`, `higgs_sweep.py`, `precision_sweep.py`,
+`shape_persist.py`, `higgs_norms.py`, `higgs_qq.py`, `identity_sweep.py`,
+`n_sweep.py`, and `phase_heatmap.py`. Their callable sweep functions also accept
+`noise_std=0.0`. The lower-bound experiments retain their separate deterministic
+error model; the dtype-based suite in `more_experiments/` is unchanged.
+
+```sh
+python n_subgauss.py --no-noise --save ablation.png
+python n_subgauss.py --noise-std 2.3283064365386963e-10 --save ablation.png
+python identity_sweep.py --n 4 8 --sig-bits 3 52 --num-samples 10 --workers 1 --no-noise
+```
+
+The first two commands use standard deviations 0 and `2^-32`, respectively.
+Outputs receive a `_noise<standard-deviation>` suffix even with `--save`:
+`ablation_noise0.png` and `ablation_noise2.3283064365386963e-10.png`, with
+correspondingly named caches. Existing unlabelled figures and caches are not
+renamed or rewritten. Each rollout batch prints its noise parameters, and new
+figures display the selected setting. New NPZ caches store a JSON `metadata`
+field; PNGs embed the same JSON in their `Description` field. Metadata records
+noise parameters, seed, experiment settings, RNG scheme, timestamp, Git revision,
+and whether the checkout has local changes. A dirty checkout is recorded as
+such, not represented as an exact committed revision.
+
+Cache readers reject missing metadata and mismatched requested settings. In
+particular, an old cache cannot be silently reused as a zero-noise result.
+For `--plot-only`, pass the same experiment settings and base `--save` path as
+in the generating command. Replotting preserves the cache's generating metadata.
+Heatmap reuse is explicit and checked:
+
+```sh
+python phase_heatmap.py --no-noise --rounding-cache n_subgauss_higgs_noise0_cache.npz
+```
+
+The dedicated `noise_vs_chop.py` comparison has two arms. `--noise-std` /
+`--no-noise` select the noise setting of the cached rounding arm. Its intentional
+noise-only arm uses `--noise-scale S` times `2^-b` (default `S=1`); set
+`--noise-scale 0` to disable that arm's added noise. Both settings are recorded
+and labelled, and the output filename also includes `_scale<S>`. Generate a
+compatible `n_subgauss.py` cache first or provide `--rounding-cache PATH`.
+
+Gaussian draws now use a separate child RNG stream per rollout, so sampling
+noise does not itself consume walk random draws. Results are reproducible across
+worker counts for fixed inputs and seeds, but adaptive trajectories can still
+diverge. This RNG change means noisy runs are not bitwise reproductions of the
+old shared-RNG implementation.
+
 
 ## Experiment scripts
 
-All scripts are run directly and save a `.png` plus a `--plot-only` npz cache.
+Scripts are run directly. Several also save summary NPZ caches for `--plot-only`.
+The names below identify the existing figures; new main-walk outputs use the
+noise suffix described above.
 
 | script | figure | question |
 |---|---|---|

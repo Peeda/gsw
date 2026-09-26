@@ -123,6 +123,7 @@ def n_subgauss(
     seed: int = 0,
     save_path: str | None = None,
     plot_only: bool = False,
+    noise_std: float = 0.0,
 ) -> None:
     if n_values is None:
         n_values = [50, 100, 200, 400, 800, 1600]
@@ -130,20 +131,26 @@ def n_subgauss(
         sig_bits_values = [2, 3, 7, 10, 23, 52]
     if save_path is None:
         save_path = f"n_subgauss_{matrix}.png"
+    save_path = rollouts.output_path(save_path, noise_std)
     cache_path = save_path.replace(".png", "_cache.npz")
 
     rng = np.random.default_rng(seed)
     m = 2
+    settings = dict(noise_std=noise_std, seed=seed, matrix=matrix, m=m,
+                    matrix_n=max(n_values), num_samples=num_samples, num_dirs=num_dirs, t=t,
+                    n_values=list(n_values), sig_bits=list(sig_bits_values))
+    metadata = rollouts.experiment_metadata(**settings)
 
     if plot_only:
-        z = np.load(cache_path)
+        z = rollouts.load_cache(cache_path, **settings)
+        metadata = rollouts.metadata_from_cache(z)
         sig_bits_values = [int(b) for b in z["sig_bits"]]
         n_values = [int(v) for v in z["n_values"]]
         stats = {}
         for i, b in enumerate(sig_bits_values):
             for j, v in enumerate(n_values):
                 stats[(b, v)] = {k: float(z[k][i, j])
-                                 for k in z.files if k not in ("sig_bits", "n_values")}
+                                 for k in z if k not in ("sig_bits", "n_values", "metadata")}
     else:
         # One nested column set: B at size n is the n-column prefix.
         if matrix == "higgs":
@@ -167,12 +174,12 @@ def n_subgauss(
                 _, projections, _ = rollouts.run_samples(
                     B, directions, num_samples,
                     sig_bits=None if sig_bits == 52 else sig_bits,
-                    noise_std=2 ** (-32), workers=workers, seed=seed,
+                    noise_std=noise_std, workers=workers, seed=seed,
                 )
                 stats[(sig_bits, n)] = collect(projections, t)
 
         keys = list(stats[(sig_bits_values[0], n_values[0])].keys())
-        np.savez(cache_path, sig_bits=np.array(sig_bits_values),
+        rollouts.save_cache(cache_path, metadata, sig_bits=np.array(sig_bits_values),
                  n_values=np.array(n_values),
                  **{k: np.array([[stats[(b, v)][k] for v in n_values]
                                  for b in sig_bits_values])
@@ -235,7 +242,7 @@ def n_subgauss(
     ax_d.legend(title="mantissa bits", fontsize=8)
 
     fig.tight_layout()
-    fig.savefig(save_path, dpi=150)
+    rollouts.save_figure(fig, save_path, metadata)
     plt.close(fig)
     print(f"saved {save_path}")
 
@@ -263,11 +270,12 @@ if __name__ == "__main__":
     parser.add_argument("--save", type=str, default=None)
     parser.add_argument("--plot-only", action="store_true",
                         help="re-plot from the cached stats .npz, no rollouts")
+    rollouts.add_noise_arguments(parser)
     args = parser.parse_args()
 
     n_subgauss(
         matrix=args.matrix, m=args.m, n_values=args.n,
         sig_bits_values=args.sig_bits, num_samples=args.num_samples,
         num_dirs=args.dirs, t=args.t, workers=args.workers,
-        seed=args.seed, save_path=args.save, plot_only=args.plot_only,
+        seed=args.seed, save_path=args.save, plot_only=args.plot_only, noise_std=args.noise_std,
     )

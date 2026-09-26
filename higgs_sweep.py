@@ -69,8 +69,14 @@ def higgs_sweep(
     workers: int | None = None,
     seed: int = 0,
     save_path: str = "higgs_sweep.png",
+    noise_std: float = 0.0,
 ) -> None:
     """Run GSW on a Higgs data submatrix across mantissa bit widths."""
+    save_path = rollouts.output_path(save_path, noise_std)
+    metadata = rollouts.experiment_metadata(noise_std, seed=seed, matrix="higgs", matrix_n=n,
+                                           num_samples=num_samples, num_dirs=num_random_dirs,
+                                           sig_bits=list(range(sig_bits_min, sig_bits_max + 1, sig_bits_step)))
+    np.random.seed(seed)
     B = load_higgs_matrix(n, seed=seed)
     m, n_actual = B.shape
     print(f"B shape: {m} × {n_actual}")
@@ -97,7 +103,7 @@ def higgs_sweep(
         bz_means, projections, bz_samples = rollouts.run_samples(
             B, directions, num_samples,
             sig_bits=None if sig_bits == 52 else sig_bits,
-            noise_std=2**(-32),
+            noise_std=noise_std,
             workers=workers,
             seed=seed,
         )
@@ -137,7 +143,7 @@ def higgs_sweep(
     ax_cc.legend(title="mantissa bits")
 
     fig.tight_layout()
-    fig.savefig(save_path, dpi=150)
+    rollouts.save_figure(fig, save_path, metadata)
     plt.close(fig)
     print(f"saved {save_path}")
 
@@ -156,6 +162,7 @@ if __name__ == "__main__":
                         help="random seed")
     parser.add_argument("--save", type=str, default="higgs_sweep.png",
                         help="output plot path")
+    rollouts.add_noise_arguments(parser)
     args = parser.parse_args()
 
     higgs_sweep(
@@ -163,5 +170,5 @@ if __name__ == "__main__":
         num_samples=args.num_samples,
         workers=args.workers,
         seed=args.seed,
-        save_path=args.save,
+        save_path=args.save, noise_std=args.noise_std,
     )

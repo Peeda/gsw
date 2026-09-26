@@ -40,22 +40,42 @@ def main():
     p.add_argument("--workers", type=int, default=6)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--plot-only", action="store_true")
+    p.add_argument("--rounding-cache", default=None)
+    p.add_argument("--save", default="noise_vs_chop.png")
+    p.add_argument("--noise-scale", type=rollouts.noise_std_value, default=1.0,
+                   help="noise-arm standard deviation is this scale times 2^-b; 0 disables it")
+    rollouts.add_noise_arguments(p, scope="the rounding arm only; --noise-scale controls the noise arm")
     args = p.parse_args()
 
-    cache_round = "n_subgauss_higgs_cache.npz"
-    cache_noise = "noise_vs_chop_cache.npz"
+    cache_round = args.rounding_cache or rollouts.output_path(
+        "n_subgauss_higgs.png", args.noise_std).replace(".png", "_cache.npz")
+    save_path = rollouts.output_path(args.save, args.noise_std).replace(
+        ".png", f"_scale{args.noise_scale:.17g}.png")
+    cache_noise = save_path.replace(".png", "_cache.npz")
     rng = np.random.default_rng(args.seed)
+    settings = dict(noise_std=args.noise_std, seed=args.seed, matrix="higgs",
+                    num_samples=args.num_samples, num_dirs=args.dirs, t=args.t)
 
     # rounding stats from the n_sweep cache
-    z = np.load(cache_round)
+    z = rollouts.load_cache(cache_round, **settings)
     sig_bits_values = [int(b) for b in z["sig_bits"]]
     n_values = [int(v) for v in z["n_values"]]
+    settings.update(matrix_n=max(n_values), comparison_noise_scale=args.noise_scale,
+                    sig_bits=sig_bits_values, n_values=n_values)
+    if rollouts.metadata_from_cache(z).get("matrix_n") != max(n_values):
+        raise ValueError("Rounding cache matrix size does not match its n grid")
+    metadata = rollouts.experiment_metadata(**settings,
+                                           rounding_source=rollouts.metadata_from_cache(z))
+    print(f"Noise-only arm: std={args.noise_scale:g} * 2^-b")
     stats_r = {(int(b), int(n)): {"sig_max": float(z["sig_max"][i, j])}
                for i, b in enumerate(sig_bits_values)
                for j, n in enumerate(n_values)}
 
     if args.plot_only:
-        zn = np.load(cache_noise)
+        # Verify the noise-arm settings match the cache, but keep the fresh
+        # metadata: the figure must attribute the rounding arm actually read
+        # above, not the snapshot stored when the noise arm was generated.
+        zn = rollouts.load_cache(cache_noise, **settings)
         stats_nz = {(int(b), int(n)): {"sig_max": float(zn["sig_max"][i, j])}
                     for i, b in enumerate(sig_bits_values)
                     for j, n in enumerate(n_values)}
@@ -68,11 +88,11 @@ def main():
                 dirs = _directions_for(B, args.dirs, rng)
                 _, projections, _ = rollouts.run_samples(
                     B, dirs, args.num_samples,
-                    sig_bits=None, noise_std=2.0 ** (-sig_bits),
+                    sig_bits=None, noise_std=args.noise_scale * 2.0 ** (-sig_bits),
                     workers=args.workers, seed=args.seed,
                 )
                 stats_nz[(sig_bits, n)] = collect(projections, args.t)
-        np.savez(cache_noise,
+        rollouts.save_cache(cache_noise, metadata,
                  **{k: np.array([[stats_nz[(b, n)][k] for n in n_values]
                                  for b in sig_bits_values])
                     for k in stats_nz[sig_bits_values[0], n_values[0]]})
@@ -118,9 +138,9 @@ def main():
     ax_cn.legend(fontsize=7)
 
     fig.tight_layout()
-    fig.savefig("noise_vs_chop.png", dpi=150)
+    rollouts.save_figure(fig, save_path, metadata)
     plt.close(fig)
-    print("saved noise_vs_chop.png")
+    print(f"saved {save_path}")
 
 
 if __name__ == "__main__":

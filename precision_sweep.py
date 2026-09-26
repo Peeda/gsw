@@ -4,6 +4,7 @@ os.environ.setdefault("chop_backend", "numpy")
 for _v in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
     os.environ.setdefault(_v, "1")
 
+import argparse
 import matplotlib
 matplotlib.use("Agg")  # non-interactive: save figures, never pop up a window
 import matplotlib.pyplot as plt
@@ -71,12 +72,17 @@ def _plot_inf_norm_ccdf(ax, bz_samples, label, color, linestyle="-"):
             alpha=0.4, linewidth=1)
 
 
-def precision_sweep(m: int, n: int, num_samples: int = 10000, *, workers: int | None = None) -> None:
+def precision_sweep(m: int, n: int, num_samples: int = 10000, *, workers: int | None = None,
+                    noise_std: float = 0.0, seed: int = 0, save_path: str = "precision_sweep.png") -> None:
     """Sweep mantissa bits 2–52; plot mean of Bz (dim 0) and subgaussianity.
 
     workers: number of processes for the Monte-Carlo rollouts (default ≈ physical cores;
     pass workers=1 to run serially).
     """
+    save_path = rollouts.output_path(save_path, noise_std)
+    metadata = rollouts.experiment_metadata(noise_std, seed=seed, matrix="clustered", m=m, n=n,
+                                           num_samples=num_samples, sig_bits=list(range(2, 53, 10)))
+    np.random.seed(seed)
     u = np.random.randn(m); u /= np.linalg.norm(u)
     epsilon = 1 / np.sqrt(m)
     B = u[:, None] + epsilon * np.random.randn(m, n)
@@ -107,7 +113,7 @@ def precision_sweep(m: int, n: int, num_samples: int = 10000, *, workers: int | 
         bz_means, projections, bz_samples = rollouts.run_samples(
             B, directions, num_samples,
             sig_bits=None if sig_bits == 52 else sig_bits,
-            noise_std=2**(-32), workers=workers,
+            noise_std=noise_std, workers=workers, seed=seed,
         )
         _plot_inf_norm_ccdf(ax_cc, bz_samples, f"{sig_bits}b", col)
         abs_bz = np.abs(bz_means)
@@ -145,10 +151,21 @@ def precision_sweep(m: int, n: int, num_samples: int = 10000, *, workers: int | 
     ax_cc.legend(title="mantissa bits")
 
     fig.tight_layout()
-    fig.savefig("precision_sweep.png", dpi=150)
+    rollouts.save_figure(fig, save_path, metadata)
     plt.close(fig)
-    print("saved precision_sweep.png")
+    print(f"saved {save_path}")
 
 
 if __name__ == "__main__":
-    precision_sweep(m=500, n=100, num_samples=10000)
+    parser = argparse.ArgumentParser(description="Clustered-matrix precision sweep")
+    parser.add_argument("--m", type=int, default=500)
+    parser.add_argument("--n", type=int, default=100)
+    parser.add_argument("--num-samples", type=int, default=10000)
+    parser.add_argument("--workers", type=int, default=None)
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--save", default="precision_sweep.png")
+    rollouts.add_noise_arguments(parser)
+    args = parser.parse_args()
+    precision_sweep(m=args.m, n=args.n, num_samples=args.num_samples,
+                    workers=args.workers, noise_std=args.noise_std, seed=args.seed,
+                    save_path=args.save)

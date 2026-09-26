@@ -4,6 +4,7 @@ os.environ.setdefault("chop_backend", "numpy")
 for _v in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
     os.environ.setdefault(_v, "1")
 
+import argparse
 import matplotlib
 matplotlib.use("Agg")  # non-interactive: save figures, never pop up a window
 import matplotlib.pyplot as plt
@@ -61,8 +62,10 @@ def n_sweep(
     noise_mean: float = 0.0,
     noise_std: float = 0.0,
     workers: int | None = None,
+    seed: int = 0,
+    save_path: str | None = None,
 ) -> None:
-    """Sweep n with fixed m; supports chop mode (sig_bits) or noise mode (noise_mean/noise_std), not both.
+    """Sweep n with fixed m; supports optional rounding (sig_bits) and added noise (noise_mean/noise_std).
 
     sig_bits is the number of mantissa bits kept in the rounding (exponent unbounded).
     Mantissa bits per standard format:
@@ -77,19 +80,25 @@ def n_sweep(
     """
     has_chop  = sig_bits is not None
     has_noise = noise_mean != 0.0 or noise_std != 0.0
-    if has_chop and has_noise:
-        raise ValueError("specify either sig_bits or noise parameters, not both")
+    rollouts.validate_noise(noise_mean, noise_std)
+    np.random.seed(seed)
 
     if has_chop:
         desc = f"mantissa={sig_bits} bits"
         tag  = f"m{sig_bits}"
+        if has_noise:
+            desc += f", noise=N({noise_mean}, {noise_std})"
+            tag += f"_mean{noise_mean}"
     else:
         desc = f"noise=N({noise_mean}, {noise_std})"
         tag  = f"noise_N({noise_mean},{noise_std})"
     title    = f"GSW n sweep  —  m={m}, {desc}, {num_samples} samples"
-    savepath = f"results/n_sweep_{tag}.png"
+    savepath = rollouts.output_path(save_path or f"results/n_sweep_{tag}.png", noise_std)
 
     n_list = list(n_values)
+    metadata = rollouts.experiment_metadata(noise_std, seed=seed, noise_mean=noise_mean,
+                                           matrix="clustered", m=m, n_values=n_list,
+                                           num_samples=num_samples, sig_bits=sig_bits)
     colors = plt.cm.viridis(np.linspace(0, 1, len(n_list)))
     fig, (ax_disc, ax_sg, ax_cc) = plt.subplots(1, 3, figsize=(15, 4))
     fig.suptitle(title)
@@ -111,7 +120,7 @@ def n_sweep(
         bz_means, projections, bz_samples = rollouts.run_samples(
             B, directions, num_samples,
             sig_bits=sig_bits, noise_mean=noise_mean, noise_std=noise_std,
-            workers=workers,
+            workers=workers, seed=seed,
         )
         _plot_inf_norm_ccdf(ax_cc, bz_samples, f"n={n}", col)
         abs_bz = np.abs(bz_means)
@@ -149,7 +158,7 @@ def n_sweep(
     ax_cc.legend()
 
     fig.tight_layout()
-    fig.savefig(savepath, dpi=150)
+    rollouts.save_figure(fig, savepath, metadata)
     plt.close(fig)
     print(f"saved {savepath}")
 
@@ -162,8 +171,10 @@ def mn_sweep(
     noise_mean: float = 0.0,
     noise_std: float = 0.0,
     workers: int | None = None,
+    seed: int = 0,
+    save_path: str | None = None,
 ) -> None:
-    """Sweep N with m=n=N (square B); supports chop mode (sig_bits) or noise mode (noise_mean/noise_std), not both.
+    """Sweep N with m=n=N (square B); supports optional rounding (sig_bits) and added noise (noise_mean/noise_std).
 
     sig_bits is the number of mantissa bits kept in the rounding (exponent unbounded).
     Mantissa bits per standard format:
@@ -178,19 +189,25 @@ def mn_sweep(
     """
     has_chop  = sig_bits is not None
     has_noise = noise_mean != 0.0 or noise_std != 0.0
-    if has_chop and has_noise:
-        raise ValueError("specify either sig_bits or noise parameters, not both")
+    rollouts.validate_noise(noise_mean, noise_std)
+    np.random.seed(seed)
 
     if has_chop:
         desc = f"mantissa={sig_bits} bits"
         tag  = f"m{sig_bits}"
+        if has_noise:
+            desc += f", noise=N({noise_mean}, {noise_std})"
+            tag += f"_mean{noise_mean}"
     else:
         desc = f"noise=N({noise_mean}, {noise_std})"
         tag  = f"noise_N({noise_mean},{noise_std})"
     title    = f"GSW m=n sweep  —  {desc}, {num_samples} samples"
-    savepath = f"results/mn_sweep_{tag}.png"
+    savepath = rollouts.output_path(save_path or f"results/mn_sweep_{tag}.png", noise_std)
 
     N_list = list(N_values)
+    metadata = rollouts.experiment_metadata(noise_std, seed=seed, noise_mean=noise_mean,
+                                           matrix="clustered_square", n_values=N_list,
+                                           num_samples=num_samples, sig_bits=sig_bits)
     colors = plt.cm.viridis(np.linspace(0, 1, len(N_list)))
     fig, (ax_disc, ax_sg, ax_cc) = plt.subplots(1, 3, figsize=(15, 4))
     fig.suptitle(title)
@@ -209,7 +226,7 @@ def mn_sweep(
         bz_means, projections, bz_samples = rollouts.run_samples(
             B, directions, num_samples,
             sig_bits=sig_bits, noise_mean=noise_mean, noise_std=noise_std,
-            workers=workers,
+            workers=workers, seed=seed,
         )
         _plot_inf_norm_ccdf(ax_cc, bz_samples, f"N={N}", col)
         mean_discrepancies.append(np.abs(bz_means).mean())
@@ -242,14 +259,30 @@ def mn_sweep(
     ax_cc.legend()
 
     fig.tight_layout()
-    fig.savefig(savepath, dpi=150)
+    rollouts.save_figure(fig, savepath, metadata)
     plt.close(fig)
     print(f"saved {savepath}")
 
 
 if __name__ == "__main__":
-    m, n_values, num_samples = 30, range(250, 2001, 250), 10000
-    n_sweep(m, n_values, num_samples)
+    parser = argparse.ArgumentParser(description="Clustered-matrix size sweep")
+    parser.add_argument("--m", type=int, default=30)
+    parser.add_argument("--n", type=int, nargs="+", default=list(range(250, 2001, 250)))
+    parser.add_argument("--num-samples", type=int, default=10000)
+    parser.add_argument("--sig-bits", type=int, default=None)
+    parser.add_argument("--workers", type=int, default=None)
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--save", default=None)
+    parser.add_argument("--square", action="store_true")
+    rollouts.add_noise_arguments(parser)
+    args = parser.parse_args()
+    m, n_values, num_samples = args.m, args.n, args.num_samples
+    options = dict(sig_bits=args.sig_bits, noise_std=args.noise_std, workers=args.workers,
+                   seed=args.seed, save_path=args.save)
+    if args.square:
+        mn_sweep(n_values, num_samples, **options)
+    else:
+        n_sweep(m, n_values, num_samples, **options)
     # n_sweep(m, n_values, num_samples, noise_mean=0.0, noise_std=2**(-10))
     # n_sweep(m, n_values, 200, sig_bits=3)
     N_values = range(200, 1001, 200)

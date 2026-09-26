@@ -35,12 +35,18 @@ def identity_sweep(
     num_random_dirs: int = 20,
     workers: int | None = None,
     save_path: str = "identity_sweep.png",
+    noise_std: float = 0.0,
 ) -> None:
     """Run GSW on B = I_n across n and mantissa bits."""
     if n_values is None:
         n_values = [100, 200, 500, 1000]
     if sig_bits_values is None:
         sig_bits_values = [10, 13, 20, 30, 40, 52]
+    save_path = rollouts.output_path(save_path, noise_std)
+    metadata = rollouts.experiment_metadata(noise_std, seed=0, matrix="identity",
+                                           n_values=list(n_values), sig_bits=list(sig_bits_values),
+                                           num_samples=num_samples, num_dirs=num_random_dirs)
+    np.random.seed(0)
 
     # single pass over all (sig_bits, n) configs; reuse for every panel
     mom_lists = {}
@@ -52,7 +58,7 @@ def identity_sweep(
             _, projections, bz = rollouts.run_samples(
                 B, directions, num_samples,
                 sig_bits=None if sig_bits == 52 else sig_bits,
-                noise_std=0.0,
+                noise_std=noise_std,
                 workers=workers,
                 seed=0,
             )
@@ -105,7 +111,7 @@ def identity_sweep(
     ax_cc.legend(fontsize=7)
 
     fig.tight_layout()
-    fig.savefig(save_path, dpi=150)
+    rollouts.save_figure(fig, save_path, metadata)
     plt.close(fig)
     print(f"saved {save_path}")
 
@@ -124,6 +130,7 @@ if __name__ == "__main__":
                         help="number of parallel workers")
     parser.add_argument("--save", default="identity_sweep.png",
                         help="output plot path")
+    rollouts.add_noise_arguments(parser)
     args = parser.parse_args()
 
     identity_sweep(
@@ -131,5 +138,5 @@ if __name__ == "__main__":
         sig_bits_values=args.sig_bits,
         num_samples=args.num_samples,
         workers=args.workers,
-        save_path=args.save,
+        save_path=args.save, noise_std=args.noise_std,
     )

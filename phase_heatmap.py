@@ -1,7 +1,8 @@
 """Phase diagram: log sigma-hat over the (n, mantissa-bits) plane — Higgs B.
 
-Denser bit grid (2..16 plus 23, 52) x n (50..1600). Cells already in
-n_subgauss_higgs_cache.npz are reused; the rest are computed here.
+Denser bit grid (2..16 plus 23, 52) x n (50..1600). Cells already in a
+provenance-checked n_subgauss cache (the default noise-labelled path or
+--rounding-cache PATH) are reused; the rest are computed here.
 
 Overlays the empirical boundary n_crit ~ 10 * 2^b (where the rounding term
 0.08·n·2^-b crosses the fp64 plateau sigma_0 ~ 0.75) and fp-format rows.
@@ -34,6 +35,10 @@ def main():
     p.add_argument("--workers", type=int, default=6)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--plot-only", action="store_true")
+    p.add_argument("--save", default="phase_heatmap.png")
+    p.add_argument("--rounding-cache", default=None,
+                   help="optional provenance-checked n_subgauss cache to reuse")
+    rollouts.add_noise_arguments(p)
     args = p.parse_args()
 
     n_values = [50, 100, 200, 400, 800, 1600]
@@ -41,20 +46,26 @@ def main():
     rng = np.random.default_rng(args.seed)
 
     grid = np.full((len(all_bits), len(n_values)), np.nan)
-    cache = "phase_heatmap_cache.npz"
+    save_path = rollouts.output_path(args.save, args.noise_std)
+    cache = save_path.replace(".png", "_cache.npz")
+    settings = dict(noise_std=args.noise_std, seed=args.seed, matrix="higgs", matrix_n=max(n_values),
+                    num_samples=args.num_samples, num_dirs=args.dirs, t=args.t)
+    metadata = rollouts.experiment_metadata(**settings, n_values=n_values, sig_bits=all_bits)
 
     # reuse what we already measured
-    z = np.load("n_subgauss_higgs_cache.npz")
-    for i, b in enumerate(z["sig_bits"]):
-        if int(b) in all_bits:
-            for j, n in enumerate(z["n_values"]):
-                grid[all_bits.index(int(b)), n_values.index(int(n))] = \
-                    z["sig_max"][i, j]
+    if args.rounding_cache and not args.plot_only:
+        z = rollouts.load_cache(args.rounding_cache, **settings)
+        metadata["source_cache_metadata"] = rollouts.metadata_from_cache(z)
+        for i, b in enumerate(z["sig_bits"]):
+            if int(b) in all_bits:
+                for j, n in enumerate(z["n_values"]):
+                    if int(n) in n_values:
+                        grid[all_bits.index(int(b)), n_values.index(int(n))] = z["sig_max"][i, j]
 
     if args.plot_only:
-        zz = np.load(cache)
-        mask = ~np.isnan(zz["grid"])
-        grid[mask] = zz["grid"][mask]
+        zz = rollouts.load_cache(cache, **settings, n_values=n_values, sig_bits=all_bits)
+        metadata = rollouts.metadata_from_cache(zz)
+        grid = zz["grid"]
     else:
         missing = [(b, n) for b in all_bits for j, n in enumerate(n_values)
                    if np.isnan(grid[all_bits.index(b), j])]
@@ -69,11 +80,11 @@ def main():
             _, projections, _ = rollouts.run_samples(
                 B, dirs, args.num_samples,
                 sig_bits=None if b == 52 else b,
-                noise_std=2 ** (-32), workers=args.workers, seed=args.seed,
+                noise_std=args.noise_std, workers=args.workers, seed=args.seed,
             )
             grid[all_bits.index(b), n_values.index(n)] = \
                 collect(projections, args.t)["sig_max"]
-        np.savez(cache, grid=grid, sig_bits=np.array(all_bits),
+        rollouts.save_cache(cache, metadata, grid=grid, sig_bits=np.array(all_bits),
                  n_values=np.array(n_values))
         print(f"cached grid -> {cache}")
 
@@ -114,9 +125,9 @@ def main():
                  f"{args.num_samples} walks")
     ax.legend(loc="upper left", fontsize=8)
     fig.tight_layout()
-    fig.savefig("phase_heatmap.png", dpi=150)
+    rollouts.save_figure(fig, save_path, metadata)
     plt.close(fig)
-    print("saved phase_heatmap.png")
+    print(f"saved {save_path}")
 
 
 if __name__ == "__main__":
